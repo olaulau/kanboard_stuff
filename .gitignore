@@ -3,4 +3,7 @@
 /.settings/
 
 /vendor/
+/apps/TaskBoard/*
+/apps/kanboard/*
 
+/conf/tech.ini
