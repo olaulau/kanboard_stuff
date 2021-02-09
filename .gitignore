@@ -3,6 +3,7 @@
 /.settings/
 
 /vendor/
+/tmp/
 /apps/TaskBoard/*
 /apps/kanboard/*
 

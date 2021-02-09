@@ -5,7 +5,7 @@ $f3 = \Base::instance();
 
 $f3->config('conf/index.ini');
 
-$db_in = new DB\SQL('sqlite:'.$f3->get("db_in.host"));
+$db_in = new DB\SQL('sqlite:'.$f3->get("db_in.file"));
 $f3->set("db_in", $db_in);
 
 $db_out = new DB\SQL(
