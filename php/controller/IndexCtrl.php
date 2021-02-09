@@ -115,12 +115,14 @@ class IndexCtrl
 		$sql = '
 			SELECT		c.title AS étape, t.title AS titre, t.description, t.date_due as délai
 			FROM		tasks t
-				INNER JOIN	columns c ON t.column_id = c.id
+			INNER JOIN	columns c
+				ON		t.column_id = c.id
 			WHERE		c.title  NOT LIKE "%FACTURATION%"
 				AND		t.date_due != ""
+				AND		c.project_id = ?
 			ORDER BY	t.date_due ASC, c.position ASC
 		';
-		$data = $db_out->exec($sql);
+		$data = $db_out->exec($sql, [$f3->get("kanboard.project_id")]);
 		
 		$data2 = [];
 		foreach ($data as $id => $row) {
