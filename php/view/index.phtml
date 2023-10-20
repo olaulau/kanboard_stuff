@@ -1,22 +1,23 @@
 <?php
-require_once __DIR__.'/layout/head.phtml';
+require_once __DIR__ . '/layout/head.phtml';
 ?>
 
 <?php
-require_once __DIR__.'/layout/header.phtml';
+require_once __DIR__ . '/layout/header.phtml';
 ?>
 
 	<!-- Begin page content -->
 	<main role="main" class="container">
-    	<h1 class="mt-5"><?= $PAGE["title"] ?></h1>
-    	<a href="<?= $BASE ?>/migrate"> migrate </a> <br/>
-    	<a href="<?= $BASE ?>/priority"> priority </a>
+		<h1 class="mt-5"><?= $PAGE["title"] ?></h1>
+		<a href="<?= $BASE . $f3->alias("migrate", [], []) ?>"> migrate </a> <br />
+		<a href="<?= $BASE . $f3->alias("priority", [], []) ?>"> priority </a> <br />
+		<a href="<?= $BASE . $f3->alias("cadratin", [], []) ?>"> cadratin </a> <br />
 	</main>
 
 <?php
-require_once __DIR__.'/layout/footer.phtml';
+require_once __DIR__ . '/layout/footer.phtml';
 ?>
 
 <?php
-require_once __DIR__.'/layout/foot.phtml';
+require_once __DIR__ . '/layout/foot.phtml';
 ?>

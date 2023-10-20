@@ -6,5 +6,6 @@
 /tmp/
 /apps/TaskBoard/*
 /apps/kanboard/*
+/data/
 
 /conf/tech.ini

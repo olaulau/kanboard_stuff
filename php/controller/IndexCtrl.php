@@ -1,6 +1,9 @@
 <?php
 namespace controller;
 
+use service\CadratinSvc;
+use service\KanboardSvc;
+
 class IndexCtrl
 {
 
@@ -8,7 +11,7 @@ class IndexCtrl
 	{
 		
 	}
-    
+	
 	
 	public static function afterRoute ()
 	{
@@ -43,7 +46,7 @@ class IndexCtrl
 		}
 		
 		
-		// remove  output columns
+		// remove output columns
 		$out_columns_wrapper = new \DB\SQL\Mapper($db_out, "columns");
 		$out_columns = $out_columns_wrapper->find(['project_id = ?', $f3->get("kanboard.project_id")], ["order" => "position DESC"]);
 		foreach ($out_columns as $out_column) {
@@ -134,64 +137,64 @@ class IndexCtrl
 				$date->setTimestamp ( $row['délai'] );
 				$real_date = $date->format('Y-m-d');
 				unset($row['délai']);
-		    	if (!isset ($data2[$real_date])) {
-		    		$data2[$real_date] = [];
-		    	}
-		    	$data2[$real_date][] = $row;
+				if (!isset ($data2[$real_date])) {
+					$data2[$real_date] = [];
+				}
+				$data2[$real_date][] = $row;
 			}
 		}
 		ksort($data2);
 		
 		$months = [
-		    'en' => [
-		        'January',
-		        'February',
-		        'March',
-		        'April',
-		        'May',
-		        'June',
-		        'July',
-		        'August',
-		        'September',
-		        'October',
-		        'November',
-		        'December',
-		    ],
-		    'fr' => [
-		        'Janvier',
-		        'Février',
-		        'Mars',
-		        'Avril',
-		        'Mai',
-		        'Juin',
-		        'Juillet',
-		        'Août',
-		        'Septembre',
-		        'Octobre',
-		        'Novembre',
-		        'Décembre',
-		    ]
+			'en' => [
+				'January',
+				'February',
+				'March',
+				'April',
+				'May',
+				'June',
+				'July',
+				'August',
+				'September',
+				'October',
+				'November',
+				'December',
+			],
+			'fr' => [
+				'Janvier',
+				'Février',
+				'Mars',
+				'Avril',
+				'Mai',
+				'Juin',
+				'Juillet',
+				'Août',
+				'Septembre',
+				'Octobre',
+				'Novembre',
+				'Décembre',
+			]
 		];
 		
 		$days_of_week = [
-		    'en' => [
-		        'Sunday',
-		        'Monday',
-		        'Tuesday',
-		        'Wednesday',
-		        'Thursday',
-		        'Friday',
-		        'Saturday',
-		    ],
-		    'fr' => [
-		        'Dimanche',
-		        'Lundi',
-		        'Mardi',
-		        'Mercredi',
-		        'Jeudi',
-		        'Vendredi',
-		        'Samedi',
-		    ]
+			'en' => [
+				'Sunday',
+				'Monday',
+				'Tuesday',
+				'Wednesday',
+				'Thursday',
+				'Friday',
+				'Saturday',
+			],
+			'fr' => [
+				'Dimanche',
+				'Lundi',
+				'Mardi',
+				'Mercredi',
+				'Jeudi',
+				'Vendredi',
+				'Samedi',
+			]
 		];
 		
 		$f3->set("PAGE.title", "Planning par ordre de délai");
@@ -204,4 +207,30 @@ class IndexCtrl
 		echo $view->render('priority.phtml');
 	}
 	
+
+	public static function cadratinEstimageGET ($f3)
+	{
+		$id = $f3->get("PARAMS.id");
+		$data = CadratinSvc::handleEstimateFile($id);
+
+		KanboardSvc::addCadratinEstimate($data);
+		die;
+
+		$view = new \View();
+		echo $view->render('cadratin.phtml');
+	}
+	
+	
+	public static function cadratinProdGET ($f3)
+	{
+		$id = $f3->get("PARAMS.id");
+		$data = CadratinSvc::handleProdFile($id);
+
+		KanboardSvc::addCadratinProduction($data);
+		die;
+
+		$view = new \View();
+		echo $view->render('cadratin.phtml');
+	}
+
 }
