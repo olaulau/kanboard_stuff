@@ -16,18 +16,22 @@ class IndexCtrl
 	}
 
 	
-	public static function indexGET ()
+	public static function indexGET ($f3)
 	{
+		$PAGE = [
+			"title" => "accueil",
+		];
+		$f3->set("PAGE", $PAGE);
+
 		$view = new \View();
 		echo $view->render('index.phtml');
 	}
 	
 	
-	public static function migrateGET ()
+	public static function migrateGET ($f3)
 	{
-		$f3 = \Base::instance();
-		$db_in = $f3->get("db_in"); /* @var $db_in \DB\SQL\Mapper */
-		$db_out = $f3->get("db_out"); /* @var $db_in \DB\SQL\Mapper */
+		$db_in = new \DB\SQL('sqlite:'.$f3->get("db_in.file"));
+		$db_out = $f3->get("db_out"); /* @var $db_out \DB\SQL\Mapper */
 		
 		
 		// check db's connected
@@ -107,9 +111,8 @@ class IndexCtrl
 	}
 	
 	
-	public static function priorityGET ()
+	public static function priorityGET ($f3)
 	{
-		$f3 = \Base::instance();
 		$db_out = $f3->get("db_out"); /* @var $db_in \DB\SQL\Mapper */
 		
 		$sql = '
