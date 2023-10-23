@@ -109,4 +109,5 @@ abstract class KanboardSvc
 		$comment->date_modification = $now;
 		$comment->save();
     }
+	
 }
