@@ -1,6 +1,11 @@
 <?php
 namespace controller;
 
+use Datto\JsonRpc\Http\Client;
+use Datto\JsonRpc\Http\Exceptions\HttpException;
+use Datto\JsonRpc\Responses\ErrorResponse;
+use ErrorException;
+use Exception;
 use service\CadratinSvc;
 use service\KanboardSvc;
 
@@ -221,16 +226,35 @@ class IndexCtrl
 	}
 	
 	
-	public static function cadratinProdGET ($f3)
+	public static function cadratinProductionGET ($f3)
 	{
 		$id = $f3->get("PARAMS.id");
 		$data = CadratinSvc::handleProdFile($id);
-
+		
 		KanboardSvc::addCadratinProduction($data);
 		die;
-
+		
 		$view = new \View();
 		echo $view->render('cadratin.phtml');
 	}
 
+	
+	public static function testGET ($f3)
+	{
+		// prepare query data
+		$kanboard_rpc_url = $f3->get("kanboard.url") . "/jsonrpc.php";
+		$authentication = base64_encode($f3->get("kanboard.rpc.username").":".$f3->get("kanboard.rpc.token"));
+		$headers = ['Authorization' => "Basic {$authentication}"];
+
+		// test query (get version)
+		$client = new Client($kanboard_rpc_url, $headers);
+		$client->query("getVersion", [], $result); /** @var int $result */
+		try {
+			$client->send();
+		}
+		catch (Exception $exception) {
+			echo "EXCEPTION message : " . $exception->getMessage();
+		}
+		var_dump($result);
+	}
 }
