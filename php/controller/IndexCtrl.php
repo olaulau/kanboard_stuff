@@ -219,7 +219,8 @@ class IndexCtrl
 		$id = $f3->get("PARAMS.id");
 		$data = CadratinSvc::handleEstimateFile($id);
 
-		KanboardSvc::addCadratinEstimate($data);
+		$task_id = KanboardSvc::addCadratinEstimate($data);
+		echo "$task_id <br/>" . PHP_EOL;
 		die;
 
 		$view = new \View();
@@ -243,6 +244,10 @@ class IndexCtrl
 	public static function testGET ($f3)
 	{
 		$version = KanboardApiSvc::getVersion();
-		var_dump($version);
+		echo "$version <br/>" . PHP_EOL;
+		
+		$task_id = KanboardApiSvc::createTask(["title" => "titre", "project_id" => 1]);
+		echo "$task_id <br/>" . PHP_EOL;
 	}
+
 }
