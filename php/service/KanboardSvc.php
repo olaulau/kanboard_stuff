@@ -13,6 +13,10 @@ abstract class KanboardSvc
 		$project_id = $f3->get("kanboard.project_id");
 		$estimate_column_id = $f3->get("kanboard.estimate_column_id");
 
+		// query current user infos
+		$user_name = $f3->get("kanboard.rpc.username");
+		$user = KanboardApiSvc::getUserByName($user_name);
+
 		// cleanup
 		KanboardTaskApiSvc::removeAllTasksFromColumn($estimate_column_id);
 
@@ -37,10 +41,10 @@ abstract class KanboardSvc
 		// create comment
 		$params = [
 			"task_id" => $task_id,
-			"user_id" => 1, ///////////////////////
+			"user_id" => $user["id"],
 			"content" => json_encode($data, JSON_UNESCAPED_UNICODE),
 		];
-		
+
 		$comment_id = KanboardTaskApiSvc::createComment($params);
 		echo "comment id = $comment_id <br/>" . PHP_EOL;
 
@@ -50,7 +54,6 @@ abstract class KanboardSvc
 
 	public static function addCadratinProduction (array $data)
     {
-		
 		$f3 = Base::instance();
 		$db_out = $f3->get("db_out"); /* @var $db_out \DB\SQL\Mapper */
 

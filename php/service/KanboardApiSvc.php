@@ -39,7 +39,8 @@ abstract class KanboardApiSvc
 	public static function getVersion () : string
 	{
 		$client = self::getClient();
-		$client->query("getVersion", [], $result);
+		$params = [];
+		$client->query("getVersion", $params, $result);
 
 		try {
 			$client->send();
@@ -47,6 +48,30 @@ abstract class KanboardApiSvc
 		catch (Exception $exception) {
 			echo "EXCEPTION message : " . $exception->getMessage();
 		}
+
+		return $result;
+	}
+	
+	
+	public static function getUserByName ($user_name) : array
+	{
+		$client = self::getClient();
+		$params = [
+			"username" => $user_name,
+		];
+		$client->query("getUserByName", $params, $result);
+
+		try {
+			$client->send();
+		}
+		catch (Exception $exception) {
+			echo "EXCEPTION message : " . $exception->getMessage();
+		}
+		if($result instanceof ErrorResponse) { /** @var ErrorResponse $result */
+			echo " ERROR RESPONSE message = " . $result->getMessage() . "<br/>" . PHP_EOL;
+			return 0;
+		}
+
 		return $result;
 	}
 
