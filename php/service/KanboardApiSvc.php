@@ -3,6 +3,7 @@ namespace service;
 
 use Base;
 use Datto\JsonRpc\Http\Client;
+use Datto\JsonRpc\Responses\ErrorResponse;
 use ErrorException;
 use Exception;
 
@@ -26,7 +27,7 @@ abstract class KanboardApiSvc
 	}
 
 
-	protected static function getClient () : Client
+	public static function getClient () : Client
 	{
 		$kanboard_rpc_url = self::getUrl();
 		$headers = self::getAuthHeaders();
@@ -35,29 +36,10 @@ abstract class KanboardApiSvc
 	}
 
 
-    public static function getVersion () : string
-    {
+	public static function getVersion () : string
+	{
 		$client = self::getClient();
 		$client->query("getVersion", [], $result);
-
-		try {
-			$client->send();
-		}
-		catch (Exception $exception) {
-			echo "EXCEPTION message : " . $exception->getMessage();
-		}
-		return $result;
-    }
-
-
-	public static function createTask (array $params)
-	{
-		if(empty($params["title"]) || empty($params["project_id"])) {
-			throw new ErrorException(("missing required parameter"));
-		}
-
-		$client = self::getClient();
-		$client->query("createTask", $params, $result);
 
 		try {
 			$client->send();
