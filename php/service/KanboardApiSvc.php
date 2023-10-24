@@ -51,15 +51,19 @@ abstract class KanboardApiSvc
 
 		return $result;
 	}
-	
-	
-	public static function getUserByName ($user_name) : array
+
+
+	public static function clientSendQuery ($method, $required_params, $params) : mixed
 	{
+		// check required params
+		foreach($required_params as $param_name) {
+			if(empty($params[$param_name])) {
+				throw new ErrorException(("missing required parameter"));
+			}
+		}
+
 		$client = self::getClient();
-		$params = [
-			"username" => $user_name,
-		];
-		$client->query("getUserByName", $params, $result);
+		$client->query($method, $params, $result);
 
 		try {
 			$client->send();
@@ -72,6 +76,20 @@ abstract class KanboardApiSvc
 			return 0;
 		}
 
+		return $result;
+	}
+	
+	
+	public static function getUserByName ($user_name) : array
+	{
+		$required_params = [
+			"username",
+		];
+		$params = [
+			"username" => $user_name,
+		];
+
+		$result = self::clientSendQuery("getUserByName", $required_params, $params);
 		return $result;
 	}
 
