@@ -54,50 +54,38 @@ abstract class KanboardSvc
 
 	public static function addCadratinProduction (array $data)
     {
+		// prepare data
 		$f3 = Base::instance();
-		$db_out = $f3->get("db_out"); /* @var $db_out \DB\SQL\Mapper */
+		$production_column_id = $f3->get("kanboard.production_column_id");
 
-		// config ?
-		$estimate_column_id = 1;
-		$production_column_id = 2;
-
-        // prepare data
-        $project_id = $f3->get("kanboard.project_id");
-		$now = time();
-        $swimlane_wrapper = new \DB\SQL\Mapper($db_out, "swimlanes");
-		$default_swimlane = $swimlane_wrapper->findone(["project_id = ? AND position = ?", $project_id, 1], []);
-
-		// calculate position
-		$last_position = 0;
-		$task_wrapper = new \DB\SQL\Mapper($db_out, "tasks");
-		$last_task = $task_wrapper->findone(["project_id = ? AND column_id = ?", $project_id, $production_column_id], ["order" => "position DESC"]);
-		if(!empty($last_task)) {
-			$last_position = $last_task->position;
+		// find reference task
+		$reference = $data["N/référence"];
+		$task = KanboardTaskApiSvc::getTaskByReference($reference);
+		
+		// calculate new position
+		$prod_tasks = KanboardTaskApiSvc::searchTasks("column:$production_column_id");
+		$max_production_position = 0;
+		foreach($prod_tasks as $prod_task) {
+			if($prod_task["position"] > $max_production_position) {
+				$max_production_position = $prod_task["position"];
+			}
 		}
 		
-		// get estimate task
-		$reference = $data["N/référence"];
-		$task = $task_wrapper->findone(["project_id = ? AND column_id = ? AND reference = ?", $project_id, $estimate_column_id, $reference], []);
-		if(empty($task)) {
-			die("estimate task not found (reference = $reference)");
-		}
-
-        // move task
-		$task->column_id = $production_column_id;
-		$task->position = $last_position + 1;
-		$task->date_modification = $now;
-		$task->date_moved = $now;
-		$task->save();
-
+		// move task
+		$res = KanboardTaskApiSvc::moveTaskPosition($task["id"], $production_column_id, $max_production_position+1);
+		
+		// query current user infos
+		$user_name = $f3->get("kanboard.rpc.username");
+		$user = KanboardApiSvc::getUserByName($user_name);
+		
 		// create comment
-		$comment = new \DB\SQL\Mapper($db_out, "comments");
-		$comment->task_id = $task->id;
-		$comment->user_id = null;
-		$comment->date_creation = $now;
-		$comment->comment = json_encode($data, JSON_UNESCAPED_UNICODE);
-		$comment->reference = null;
-		$comment->date_modification = $now;
-		$comment->save();
+		$params = [
+			"task_id" => $task["id"],
+			"user_id" => $user["id"],
+			"content" => json_encode($data, JSON_UNESCAPED_UNICODE),
+		];
+		$comment_id = KanboardTaskApiSvc::createComment($params);
+		echo "comment id = $comment_id <br/>" . PHP_EOL;
     }
 	
 }

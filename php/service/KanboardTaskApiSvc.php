@@ -10,11 +10,8 @@ use Exception;
 abstract class KanboardTaskApiSvc
 {
 
-	public static function getAllTasksFromProject (int $project_id) : array
+	private static function getAllTasksFromProject (int $project_id) : array
 	{
-		// if(empty($params["task_id"])) {
-		// 	throw new ErrorException(("missing required parameter"));
-		// }
 		$params = [
 			"project_id" => $project_id,
 		];
@@ -49,6 +46,58 @@ abstract class KanboardTaskApiSvc
 			}
 		}
 		return $res;
+	}
+	
+	
+	public static function getTaskByReference (int $reference) : array
+	{
+		$f3 = Base::instance();
+		$params = [
+			"project_id"	=> $f3->get("kanboard.project_id"),
+			"reference"		=> $reference,
+		];
+		
+		$client = KanboardApiSvc::getClient();
+		$client->query("getTaskByReference", $params, $result);
+		
+		try {
+			$client->send();
+		}
+		catch (Exception $exception) {
+			echo "EXCEPTION message : " . $exception->getMessage();
+		}
+		if($result instanceof ErrorResponse) { /** @var ErrorResponse $result */
+			echo " ERROR RESPONSE message = " . $result->getMessage() . "<br/>" . PHP_EOL;
+			return 0;
+		}
+		
+		return $result;
+	}
+	
+	
+	public static function searchTasks (string $query) : array
+	{
+		$f3 = Base::instance();
+		$params = [
+			"project_id"	=> $f3->get("kanboard.project_id"),
+			"query"			=> $query,
+		];
+		
+		$client = KanboardApiSvc::getClient();
+		$client->query("searchTasks", $params, $result);
+		
+		try {
+			$client->send();
+		}
+		catch (Exception $exception) {
+			echo "EXCEPTION message : " . $exception->getMessage();
+		}
+		if($result instanceof ErrorResponse) { /** @var ErrorResponse $result */
+			echo " ERROR RESPONSE message = " . $result->getMessage() . "<br/>" . PHP_EOL;
+			return 0;
+		}
+		
+		return $result;
 	}
 	
 	
@@ -119,6 +168,34 @@ abstract class KanboardTaskApiSvc
 
 		$client = KanboardApiSvc::getClient();
 		$client->query("createComment", $params, $result);
+
+		try {
+			$client->send();
+		}
+		catch (Exception $exception) {
+			echo "EXCEPTION message : " . $exception->getMessage();
+		}
+		if($result instanceof ErrorResponse) { /** @var ErrorResponse $result */
+			echo " ERROR RESPONSE message = " . $result->getMessage() . "<br/>" . PHP_EOL;
+			return 0;
+		}
+
+		return $result;
+	}
+	
+	
+	public static function moveTaskPosition (int $task_id, int $dest_column_id, int $position)
+	{
+		$f3 = Base::instance();
+		$client = KanboardApiSvc::getClient();
+		$params = [
+			"project_id"	=> $f3->get("kanboard.project_id"),
+			"task_id"		=> $task_id,
+			"column_id"		=> $dest_column_id,
+			"position"		=> $position,
+			"swimlane_id"	=> null,
+		];
+		$client->query("moveTaskPosition", $params, $result);
 
 		try {
 			$client->send();
