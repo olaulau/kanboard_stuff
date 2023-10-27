@@ -7,6 +7,7 @@
 /apps/TaskBoard/*
 /apps/kanboard/*
 /data/
+/inotify/cadratin_inotify.log
 
 /conf/tech.ini
 /notes.md

@@ -49,7 +49,7 @@ abstract class KanboardTaskApiSvc
 	}
 	
 	
-	public static function getTaskByReference (int $reference) : array
+	public static function getTaskByReference (int $reference) : array | null
 	{
 		$f3 = Base::instance();
 		$params = [
@@ -65,10 +65,11 @@ abstract class KanboardTaskApiSvc
 		}
 		catch (Exception $exception) {
 			echo "EXCEPTION message : " . $exception->getMessage();
+			die;
 		}
 		if($result instanceof ErrorResponse) { /** @var ErrorResponse $result */
 			echo " ERROR RESPONSE message = " . $result->getMessage() . "<br/>" . PHP_EOL;
-			return 0;
+			die;
 		}
 		
 		return $result;

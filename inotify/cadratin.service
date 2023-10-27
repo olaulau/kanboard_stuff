@@ -1,0 +1,2 @@
+[Service]
+ExecStart=<project>/inotify/cadratin_inotify.sh

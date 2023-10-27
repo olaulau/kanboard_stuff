@@ -216,34 +216,51 @@ class IndexCtrl
 
 	public static function cadratinEstimageGET ($f3)
 	{
-		$id = $f3->get("PARAMS.id");
-		$data = CadratinSvc::handleEstimateFile($id);
-
-		$task_id = KanboardSvc::addCadratinEstimate($data);
-		die;
-
-		$view = new \View();
-		echo $view->render('cadratin.phtml');
+		$filename = $f3->get("PARAMS.filename");
+		$sort_subdir = CadratinSvc::$cadratin_done_subdir;
+		try {
+			$data = CadratinSvc::handleEstimateFile($filename);
+			
+			$task_id = KanboardSvc::addCadratinEstimate($data);
+			if(empty($task_id)) {
+				throw(new ErrorException("cadratin error"));
+			}
+		}
+		catch(Exception $ex) {
+			echo $ex->getMessage() . PHP_EOL;
+			$sort_subdir = CadratinSvc::$cadratin_error_subdir;
+		}
+		finally {
+			rename(
+				CadratinSvc::$cadratin_export_dir . "/" . CadratinSvc::$cadratin_estimate_subdir . "/" . $filename,
+				CadratinSvc::$cadratin_export_dir . "/" . CadratinSvc::$cadratin_estimate_subdir . "/$sort_subdir/" . $filename
+			);
+		}
 	}
 	
 	
 	public static function cadratinProductionGET ($f3)
 	{
-		$id = $f3->get("PARAMS.id");
-		$data = CadratinSvc::handleProdFile($id);
-		
-		KanboardSvc::addCadratinProduction($data);
-		die;
-		
-		$view = new \View();
-		echo $view->render('cadratin.phtml');
-	}
-
-	
-	public static function testGET ($f3)
-	{
-		$version = KanboardApiSvc::getVersion();
-		echo "$version <br/>" . PHP_EOL;
+		$filename = $f3->get("PARAMS.filename");
+		$sort_subdir = CadratinSvc::$cadratin_done_subdir;
+		try {
+			$data = CadratinSvc::handleProdFile($filename);
+			
+			$task_id = KanboardSvc::addCadratinProduction($data);
+			if(empty($task_id)) {
+				throw(new ErrorException("cadratin error"));
+			}
+		}
+		catch(Exception $ex) {
+			echo $ex->getMessage() . PHP_EOL;
+			$sort_subdir = CadratinSvc::$cadratin_error_subdir;
+		}
+		finally {
+			rename(
+				CadratinSvc::$cadratin_export_dir . "/" . CadratinSvc::$cadratin_production_subdir . "/" . $filename,
+				CadratinSvc::$cadratin_export_dir . "/" . CadratinSvc::$cadratin_production_subdir . "/$sort_subdir/" . $filename
+			);
+		}
 	}
 
 }

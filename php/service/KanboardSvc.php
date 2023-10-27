@@ -2,6 +2,7 @@
 namespace service;
 
 use Base;
+use ErrorException;
 
 abstract class KanboardSvc
 {
@@ -13,12 +14,12 @@ abstract class KanboardSvc
 		$project_id = $f3->get("kanboard.project_id");
 		$estimate_column_id = $f3->get("kanboard.estimate_column_id");
 
+		// cleanup
+		// KanboardTaskApiSvc::removeAllTasksFromColumn($estimate_column_id);
+		
 		// query current user infos
 		$user_name = $f3->get("kanboard.rpc.username");
 		$user = KanboardApiSvc::getUserByName($user_name);
-
-		// cleanup
-		KanboardTaskApiSvc::removeAllTasksFromColumn($estimate_column_id);
 
         // create task
 		$params = [
@@ -30,9 +31,9 @@ abstract class KanboardSvc
 			"reference" => $data["Numéro nu"],
 		];
 
-		$d = \DateTime::createFromFormat("d/m/Y", $data["Date pièce"]);
-		if($d !== false) {
-			$params["date_due"] = $d->format("Y-m-d");
+		$date = \DateTime::createFromFormat("d/m/Y", $data["Date pièce"]);
+		if($date !== false) {
+			$params["date_due"] = $date->format("Y-m-d");
 		}
 
 		$task_id = KanboardTaskApiSvc::createTask($params);
@@ -52,7 +53,7 @@ abstract class KanboardSvc
     }
 
 
-	public static function addCadratinProduction (array $data)
+	public static function addCadratinProduction (array $data) : int
     {
 		// prepare data
 		$f3 = Base::instance();
@@ -61,6 +62,10 @@ abstract class KanboardSvc
 		// find reference task
 		$reference = $data["N/référence"];
 		$task = KanboardTaskApiSvc::getTaskByReference($reference);
+		if(empty($task)) {
+			throw new ErrorException("can't find task reference = $reference");
+		}
+		echo "task id = {$task["id"]} <br/>" . PHP_EOL;
 		
 		// calculate new position
 		$prod_tasks = KanboardTaskApiSvc::searchTasks("column:$production_column_id");
@@ -72,7 +77,7 @@ abstract class KanboardSvc
 		}
 		
 		// move task
-		$res = KanboardTaskApiSvc::moveTaskPosition($task["id"], $production_column_id, $max_production_position+1);
+		KanboardTaskApiSvc::moveTaskPosition($task["id"], $production_column_id, $max_production_position+1);
 		
 		// query current user infos
 		$user_name = $f3->get("kanboard.rpc.username");
@@ -86,6 +91,8 @@ abstract class KanboardSvc
 		];
 		$comment_id = KanboardTaskApiSvc::createComment($params);
 		echo "comment id = $comment_id <br/>" . PHP_EOL;
+		
+		return $task["id"];
     }
 	
 }

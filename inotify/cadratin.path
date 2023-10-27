@@ -1,0 +1,7 @@
+[Path]
+PathModified=/<project>/data/CADRATIN export/devis/
+PathModified=/<project>/data/CADRATIN export/prod/
+Unit=cadratin.service
+
+[Install]
+WantedBy=multi-user.target
