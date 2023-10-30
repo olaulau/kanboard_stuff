@@ -25,7 +25,7 @@ abstract class KanboardSvc
 				$codes_compta = [$codes_compta];
 			}
 			foreach($codes_compta as $code_compta) {
-				if(str_starts_with($data["Code compta"], $code_compta)) {
+				if(strpos($data["Code compta"], $code_compta) === 0) {
 					break 2;
 				}
 			}
