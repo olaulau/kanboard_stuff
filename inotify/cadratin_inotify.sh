@@ -18,7 +18,7 @@ date
 IFS=$'\n'
 
 # process estimate files
-files=`ls -1 data/CADRATIN\ export/devis/*.csv 2> /dev/null`
+files=`ls -1 data/devis/*.csv 2> /dev/null`
 for file in $files
 do
 	base=`basename $file`
@@ -27,7 +27,7 @@ do
 done
 
 # process production files
-files=`ls -1 data/CADRATIN\ export/prod/*.csv 2> /dev/null`
+files=`ls -1 data/prod/*.csv 2> /dev/null`
 for file in $files
 do
 	base=`basename $file`

@@ -19,8 +19,7 @@ abstract class CadratinSvc
 	{
 		// open file
 		$f3 = Base::instance();
-		$cadratin_export_directory = $f3->get("cadratin.export_directory");
-		$csv_file = $cadratin_export_directory  ."/$subdir/$filename";
+		$csv_file = "data/$subdir/$filename";
 		$csv = @fopen($csv_file, "r");
 		if ($csv === FALSE) {
 			throw new ErrorException("cannot read CSV file : $csv_file");

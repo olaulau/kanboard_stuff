@@ -1,6 +1,6 @@
 [Path]
-PathModified=/<project>/data/CADRATIN export/devis/
-PathModified=/<project>/data/CADRATIN export/prod/
+PathModified=/<project>/data/devis/
+PathModified=/<project>/data/prod/
 Unit=cadratin.service
 
 [Install]
