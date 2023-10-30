@@ -7,8 +7,8 @@ use ErrorException;
 abstract class KanboardSvc
 {
 
-    public static function addCadratinEstimate (array $data) : int
-    {
+	public static function addCadratinEstimate (array $data) : int
+	{
 		// prepare data
 		$f3 = Base::instance();
 		$project_id = $f3->get("kanboard.project_id");
@@ -17,44 +17,59 @@ abstract class KanboardSvc
 		// cleanup
 		// KanboardTaskApiSvc::removeAllTasksFromColumn($estimate_column_id);
 		
-		// query current user infos
-		$user_name = $f3->get("kanboard.rpc.username");
-		$user = KanboardApiSvc::getUserByName($user_name);
-
-        // create task
+		// calculate color
+		$cadratin_code_compta_color = $f3->get("cadratin.code_compta_color");
+		// var_dump($data["Code compta"], $cadratin_code_compta_color); die;
+		foreach($cadratin_code_compta_color as $color => $codes_compta) {
+			if(is_int($codes_compta)) {
+				$codes_compta = [$codes_compta];
+			}
+			foreach($codes_compta as $code_compta) {
+				if(str_starts_with($data["Code compta"], $code_compta)) {
+					break 2;
+				}
+			}
+		}
+		
+		// create task
 		$params = [
-			"project_id" => $project_id,
-			"title" => $data["Désignation"],
-			"description" => $data["Edition éléments produit N°1"],
-			"color_id" => "yellow",
-			"column_id" => $estimate_column_id,
-			"reference" => $data["Numéro nu"],
+			"project_id"	=> $project_id,
+			"title"			=> $data["Désignation"],
+			"description"	=> $data["Edition éléments produit N°1"],
+			"color_id"		=> $color,
+			"column_id"		=> $estimate_column_id,
+			"reference"		=> $data["Numéro nu"],
 		];
-
+		
 		$date = \DateTime::createFromFormat("d/m/Y", $data["Date pièce"]);
 		if($date !== false) {
 			$params["date_due"] = $date->format("Y-m-d");
 		}
-
+		
 		$task_id = KanboardTaskApiSvc::createTask($params);
 		echo "task id = $task_id <br/>" . PHP_EOL;
-
+		
+		/*
+		// query current user infos
+		$user_name = $f3->get("kanboard.rpc.username");
+		$user = KanboardApiSvc::getUserByName($user_name);
+		
 		// create comment
 		$params = [
 			"task_id" => $task_id,
 			"user_id" => $user["id"],
 			"content" => json_encode($data, JSON_UNESCAPED_UNICODE),
 		];
-
 		$comment_id = KanboardTaskApiSvc::createComment($params);
 		echo "comment id = $comment_id <br/>" . PHP_EOL;
+		*/
 
 		return $task_id;
-    }
+	}
 
 
 	public static function addCadratinProduction (array $data) : int
-    {
+	{
 		// prepare data
 		$f3 = Base::instance();
 		$production_column_id = $f3->get("kanboard.production_column_id");
@@ -79,6 +94,7 @@ abstract class KanboardSvc
 		// move task
 		KanboardTaskApiSvc::moveTaskPosition($task["id"], $production_column_id, $max_production_position+1);
 		
+		/*
 		// query current user infos
 		$user_name = $f3->get("kanboard.rpc.username");
 		$user = KanboardApiSvc::getUserByName($user_name);
@@ -91,8 +107,9 @@ abstract class KanboardSvc
 		];
 		$comment_id = KanboardTaskApiSvc::createComment($params);
 		echo "comment id = $comment_id <br/>" . PHP_EOL;
+		*/
 		
 		return $task["id"];
-    }
+	}
 	
 }
