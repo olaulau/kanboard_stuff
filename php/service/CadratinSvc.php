@@ -2,13 +2,13 @@
 
 namespace service;
 
+use Base;
 use ErrorException;
 
 abstract class CadratinSvc
 {
 	
 	public static $line_return_char = "¶";
-	public static $cadratin_export_dir = "data/CADRATIN export";
 	public static $cadratin_estimate_subdir = "devis";
 	public static $cadratin_production_subdir = "prod";
 	public static $cadratin_done_subdir = "done";
@@ -18,7 +18,9 @@ abstract class CadratinSvc
 	private static function handleCsvFile(string $subdir, string $filename)
 	{
 		// open file
-		$csv_file = self::$cadratin_export_dir  ."/$subdir/$filename";
+		$f3 = Base::instance();
+		$cadratin_export_directory = $f3->get("cadratin.export_directory");
+		$csv_file = $cadratin_export_directory  ."/$subdir/$filename";
 		$csv = @fopen($csv_file, "r");
 		if ($csv === FALSE) {
 			throw new ErrorException("cannot read CSV file : $csv_file");

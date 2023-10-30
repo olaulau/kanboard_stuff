@@ -231,9 +231,10 @@ class IndexCtrl
 			$sort_subdir = CadratinSvc::$cadratin_error_subdir;
 		}
 		finally {
+			$cadratin_export_directory = $f3->get("cadratin.export_directory");
 			rename(
-				CadratinSvc::$cadratin_export_dir . "/" . CadratinSvc::$cadratin_estimate_subdir . "/" . $filename,
-				CadratinSvc::$cadratin_export_dir . "/" . CadratinSvc::$cadratin_estimate_subdir . "/$sort_subdir/" . $filename
+				$cadratin_export_directory . "/" . CadratinSvc::$cadratin_estimate_subdir . "/" . $filename,
+				$cadratin_export_directory . "/" . CadratinSvc::$cadratin_estimate_subdir . "/$sort_subdir/" . $filename
 			);
 		}
 	}
@@ -256,9 +257,10 @@ class IndexCtrl
 			$sort_subdir = CadratinSvc::$cadratin_error_subdir;
 		}
 		finally {
+			$cadratin_export_directory = $f3->get("cadratin.export_directory");
 			rename(
-				CadratinSvc::$cadratin_export_dir . "/" . CadratinSvc::$cadratin_production_subdir . "/" . $filename,
-				CadratinSvc::$cadratin_export_dir . "/" . CadratinSvc::$cadratin_production_subdir . "/$sort_subdir/" . $filename
+				$cadratin_export_directory . "/" . CadratinSvc::$cadratin_production_subdir . "/" . $filename,
+				$cadratin_export_directory . "/" . CadratinSvc::$cadratin_production_subdir . "/$sort_subdir/" . $filename
 			);
 		}
 	}
