@@ -14,12 +14,8 @@ abstract class KanboardSvc
 		$project_id = $f3->get("kanboard.project_id");
 		$estimate_column_id = $f3->get("kanboard.estimate_column_id");
 
-		// cleanup
-		// KanboardTaskApiSvc::removeAllTasksFromColumn($estimate_column_id);
-		
 		// calculate color
 		$cadratin_code_compta_color = $f3->get("cadratin.code_compta_color");
-		// var_dump($data["Code compta"], $cadratin_code_compta_color); die;
 		foreach($cadratin_code_compta_color as $color => $codes_compta) {
 			if(is_int($codes_compta)) {
 				$codes_compta = [$codes_compta];
@@ -34,8 +30,8 @@ abstract class KanboardSvc
 		// create task
 		$params = [
 			"project_id"	=> $project_id,
-			"title"			=> $data["Désignation"],
-			"description"	=> $data["Edition éléments produit N°1"],
+			"title"			=> $data["Raison sociale"],
+			"description"	=> $data["Désignation"],
 			"color_id"		=> $color,
 			"column_id"		=> $estimate_column_id,
 			"reference"		=> $data["Numéro nu"],
@@ -49,7 +45,6 @@ abstract class KanboardSvc
 		$task_id = KanboardTaskApiSvc::createTask($params);
 		echo "task id = $task_id <br/>" . PHP_EOL;
 		
-		/*
 		// query current user infos
 		$user_name = $f3->get("kanboard.rpc.username");
 		$user = KanboardApiSvc::getUserByName($user_name);
@@ -58,11 +53,10 @@ abstract class KanboardSvc
 		$params = [
 			"task_id" => $task_id,
 			"user_id" => $user["id"],
-			"content" => json_encode($data, JSON_UNESCAPED_UNICODE),
+			"content" => $data["Edition éléments produit N°1"],
 		];
 		$comment_id = KanboardTaskApiSvc::createComment($params);
 		echo "comment id = $comment_id <br/>" . PHP_EOL;
-		*/
 
 		return $task_id;
 	}

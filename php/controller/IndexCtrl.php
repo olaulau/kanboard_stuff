@@ -9,6 +9,7 @@ use Exception;
 use service\CadratinSvc;
 use service\KanboardApiSvc;
 use service\KanboardSvc;
+use service\KanboardTaskApiSvc;
 
 class IndexCtrl
 {
@@ -216,6 +217,11 @@ class IndexCtrl
 
 	public static function cadratinEstimageGET ($f3)
 	{
+		// cleanup
+		// $estimate_column_id = $f3->get("kanboard.estimate_column_id");
+		// KanboardTaskApiSvc::removeAllTasksFromColumn($estimate_column_id);
+		// die;
+		
 		$filename = $f3->get("PARAMS.filename");
 		$sort_subdir = CadratinSvc::$cadratin_done_subdir;
 		try {

@@ -49,7 +49,7 @@ abstract class KanboardTaskApiSvc
 	}
 	
 	
-	public static function getTaskByReference (int $reference) : array | null
+	public static function getTaskByReference (int $reference)
 	{
 		$f3 = Base::instance();
 		$params = [
