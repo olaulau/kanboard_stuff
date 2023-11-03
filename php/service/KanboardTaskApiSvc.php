@@ -140,7 +140,7 @@ abstract class KanboardTaskApiSvc
 	public static function createTask (array $params)
 	{
 		if(empty($params["title"]) || empty($params["project_id"])) {
-			throw new ErrorException(("missing required parameter"));
+			throw new ErrorException("createTask : missing required parameter");
 		}
 
 		$client = KanboardApiSvc::getClient();
@@ -164,7 +164,7 @@ abstract class KanboardTaskApiSvc
 	public static function createComment (array $params)
 	{
 		if(empty($params["task_id"]) || empty($params["user_id"]) || empty($params["content"])) {
-			throw new ErrorException(("missing required parameter"));
+			throw new ErrorException("createComment : missing required parameter");
 		}
 
 		$client = KanboardApiSvc::getClient();

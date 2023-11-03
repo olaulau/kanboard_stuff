@@ -53,12 +53,12 @@ abstract class KanboardApiSvc
 	}
 
 
-	public static function clientSendQuery ($method, $required_params, $params) : mixed
+	public static function clientSendQuery ($method, $required_params, $params)
 	{
 		// check required params
 		foreach($required_params as $param_name) {
 			if(empty($params[$param_name])) {
-				throw new ErrorException(("missing required parameter"));
+				throw new ErrorException("missing required parameter : clientSendQuery ( method = method , param = $param_name");
 			}
 		}
 
@@ -69,10 +69,11 @@ abstract class KanboardApiSvc
 			$client->send();
 		}
 		catch (Exception $exception) {
-			echo "EXCEPTION message : " . $exception->getMessage();
+			echo "clientSendQuery (method = $method) EXCEPTION message : " . $exception->getMessage() . PHP_EOL;
+			return 0;
 		}
 		if($result instanceof ErrorResponse) { /** @var ErrorResponse $result */
-			echo " ERROR RESPONSE message = " . $result->getMessage() . "<br/>" . PHP_EOL;
+			echo "ERROR RESPONSE message = " . $result->getMessage() . "<br/>" . PHP_EOL;
 			return 0;
 		}
 
@@ -80,7 +81,7 @@ abstract class KanboardApiSvc
 	}
 	
 	
-	public static function getUserByName ($user_name) : array
+	public static function getUserByName ($user_name)
 	{
 		$required_params = [
 			"username",

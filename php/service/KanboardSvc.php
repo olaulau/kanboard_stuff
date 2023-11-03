@@ -21,7 +21,7 @@ abstract class KanboardSvc
 				$codes_compta = [$codes_compta];
 			}
 			foreach($codes_compta as $code_compta) {
-				if(strpos($data["Code compta"], $code_compta) === 0) {
+				if(strpos($data["Code compta"], strval($code_compta)) === 0) {
 					break 2;
 				}
 			}
@@ -46,13 +46,16 @@ abstract class KanboardSvc
 		echo "task id = $task_id <br/>" . PHP_EOL;
 		
 		// query current user infos
+		$user_id = $f3->get("kanboard.rpc.user_id");Z
+		/*
 		$user_name = $f3->get("kanboard.rpc.username");
-		$user = KanboardApiSvc::getUserByName($user_name);
+		user = KanboardApiSvc::getUserByName($user_name);
+		*/
 		
 		// create comment
 		$params = [
 			"task_id" => $task_id,
-			"user_id" => $user["id"],
+			"user_id" => $user_id /*$user["id"]*/,
 			"content" => $data["Edition éléments produit N°1"],
 		];
 		$comment_id = KanboardTaskApiSvc::createComment($params);
