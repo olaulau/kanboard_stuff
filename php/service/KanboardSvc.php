@@ -46,7 +46,8 @@ abstract class KanboardSvc
 		echo "task id = $task_id <br/>" . PHP_EOL;
 		
 		// query current user infos
-		$user_id = $f3->get("kanboard.rpc.user_id");Z
+		//@see https://docs.kanboard.org/v1/api/me_procedures/#getme
+		$user_id = $f3->get("kanboard.rpc.user_id");
 		/*
 		$user_name = $f3->get("kanboard.rpc.username");
 		user = KanboardApiSvc::getUserByName($user_name);
