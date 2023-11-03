@@ -61,27 +61,37 @@ abstract class KanboardSvc
 		];
 		$comment_id = KanboardTaskApiSvc::createComment($params);
 		echo "comment id = $comment_id <br/>" . PHP_EOL;
-
+		
 		return $task_id;
 	}
 
-
+	
 	public static function addCadratinProduction (array $data) : int
 	{
 		// prepare data
 		$f3 = Base::instance();
+		$estimate_column_id = $f3->get("kanboard.estimate_column_id");
 		$production_column_id = $f3->get("kanboard.production_column_id");
-
+		
 		// find reference task
 		$reference = $data["N/référence"];
-		$task = KanboardTaskApiSvc::getTaskByReference($reference);
-		if(empty($task)) {
+		
+		$tasks = KanboardTaskApiSvc::searchTasks("status:open column:$estimate_column_id ref:$reference");
+		if($tasks === false) {
+			throw new ErrorException("ERROR while searching for reference task");
+		}
+		if(count($tasks) === 0) {
 			throw new ErrorException("can't find task reference = $reference");
 		}
+		if(count($tasks) > 1) {
+			throw new ErrorException("too many tasks reference = $reference");
+		}
+		
+		$task = $tasks[0];
 		echo "task id = {$task["id"]} <br/>" . PHP_EOL;
 		
 		// calculate new position
-		$prod_tasks = KanboardTaskApiSvc::searchTasks("column:$production_column_id");
+		$prod_tasks = KanboardTaskApiSvc::searchTasks("status:open column:$production_column_id");
 		$max_production_position = 0;
 		foreach($prod_tasks as $prod_task) {
 			if($prod_task["position"] > $max_production_position) {
@@ -90,23 +100,8 @@ abstract class KanboardSvc
 		}
 		
 		// move task
-		KanboardTaskApiSvc::moveTaskPosition($task["id"], $production_column_id, $max_production_position+1);
-		
-		/*
-		// query current user infos
-		$user_name = $f3->get("kanboard.rpc.username");
-		$user = KanboardApiSvc::getUserByName($user_name);
-		
-		// create comment
-		$params = [
-			"task_id" => $task["id"],
-			"user_id" => $user["id"],
-			"content" => json_encode($data, JSON_UNESCAPED_UNICODE),
-		];
-		$comment_id = KanboardTaskApiSvc::createComment($params);
-		echo "comment id = $comment_id <br/>" . PHP_EOL;
-		*/
-		
+		$res = KanboardTaskApiSvc::moveTaskPosition($task["id"], $production_column_id, $max_production_position+1);
+		echo "moveTaskPosition = $res <br/>" . PHP_EOL;
 		return $task["id"];
 	}
 	

@@ -34,21 +34,6 @@ abstract class KanboardTaskApiSvc
 	}
 	
 	
-	public static function getAllTasksFromColumn (int $column_id) : array
-	{
-		$f3 = Base::instance();
-		$all_tasks = self::getAllTasksFromProject($f3->get("kanboard.project_id"));
-
-		$res = [];
-		foreach($all_tasks as $task) {
-			if($task["column_id"] === $column_id) {
-				$res [] = $task;
-			}
-		}
-		return $res;
-	}
-	
-	
 	public static function getTaskByReference (int $reference)
 	{
 		$f3 = Base::instance();
@@ -124,6 +109,21 @@ abstract class KanboardTaskApiSvc
 		return $result;
 	}
 
+	
+	private static function getAllTasksFromColumn (int $column_id) : array
+	{
+		$f3 = Base::instance();
+		$all_tasks = self::getAllTasksFromProject($f3->get("kanboard.project_id"));
+
+		$res = [];
+		foreach($all_tasks as $task) {
+			if($task["column_id"] === $column_id) {
+				$res [] = $task;
+			}
+		}
+		return $res;
+	}
+	
 
 	public static function removeAllTasksFromColumn (int $column_id)
 	{
