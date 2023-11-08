@@ -13,7 +13,13 @@ abstract class KanboardSvc
 		$f3 = Base::instance();
 		$project_id = $f3->get("kanboard.project_id");
 		$estimate_column_id = $f3->get("kanboard.estimate_column_id");
-
+		
+		// remove old tasks (deleted estimates) to avoid duplicate reference
+		$tasks = KanboardTaskApiSvc::searchTasks("status:open column:$estimate_column_id ref:" . $data["Numéro nu"]);
+		foreach($tasks as $task) {
+			KanboardTaskApiSvc::removeTask($task["id"]);
+		}
+		
 		// calculate color
 		$cadratin_code_compta_color = $f3->get("cadratin.code_compta_color");
 		foreach($cadratin_code_compta_color as $color => $codes_compta) {
@@ -43,7 +49,7 @@ abstract class KanboardSvc
 		}
 		
 		$task_id = KanboardTaskApiSvc::createTask($params);
-		echo "task id = $task_id <br/>" . PHP_EOL;
+		echo "task id = $task_id" . PHP_EOL;
 		
 		// query current user infos
 		//@see https://docs.kanboard.org/v1/api/me_procedures/#getme
@@ -61,7 +67,7 @@ abstract class KanboardSvc
 				"content" => $data["Edition éléments produit N°1"],
 			];
 			$comment_id = KanboardTaskApiSvc::createComment($params);
-			echo "comment id = $comment_id <br/>" . PHP_EOL;
+			echo "comment id = $comment_id" . PHP_EOL;
 		}
 		
 		return $task_id;
@@ -90,7 +96,7 @@ abstract class KanboardSvc
 		}
 		
 		$task = $tasks[0];
-		echo "task id = {$task["id"]} <br/>" . PHP_EOL;
+		echo "task id = {$task["id"]}" . PHP_EOL;
 		
 		// calculate new position
 		$prod_tasks = KanboardTaskApiSvc::searchTasks("status:open column:$production_column_id");
