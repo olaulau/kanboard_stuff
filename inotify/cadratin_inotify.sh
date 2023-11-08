@@ -21,6 +21,7 @@ IFS=$'\n'
 files=`ls -1 data/devis/*.csv 2> /dev/null`
 for file in $files
 do
+	echo ""
 	base=`basename $file`
 	echo  " devis : $base"
 	php index.php cadratin devis $base
@@ -30,6 +31,7 @@ done
 files=`ls -1 data/prod/*.csv 2> /dev/null`
 for file in $files
 do
+	echo ""
 	base=`basename $file`
 	echo  " prod : $base"
 	php index.php cadratin prod $base

@@ -215,7 +215,7 @@ class IndexCtrl
 	}
 	
 
-	public static function cadratinEstimageGET ($f3)
+	public static function cadratinEstimateGET ($f3)
 	{
 		// cleanup
 		// $estimate_column_id = $f3->get("kanboard.estimate_column_id");

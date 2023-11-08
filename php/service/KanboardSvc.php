@@ -54,13 +54,15 @@ abstract class KanboardSvc
 		*/
 		
 		// create comment
-		$params = [
-			"task_id" => $task_id,
-			"user_id" => $user_id /*$user["id"]*/,
-			"content" => $data["Edition éléments produit N°1"],
-		];
-		$comment_id = KanboardTaskApiSvc::createComment($params);
-		echo "comment id = $comment_id <br/>" . PHP_EOL;
+		if(!empty($data["Edition éléments produit N°1"])) {
+			$params = [
+				"task_id" => $task_id,
+				"user_id" => $user_id /*$user["id"]*/,
+				"content" => $data["Edition éléments produit N°1"],
+			];
+			$comment_id = KanboardTaskApiSvc::createComment($params);
+			echo "comment id = $comment_id <br/>" . PHP_EOL;
+		}
 		
 		return $task_id;
 	}
@@ -101,7 +103,6 @@ abstract class KanboardSvc
 		
 		// move task
 		$res = KanboardTaskApiSvc::moveTaskPosition($task["id"], $production_column_id, $max_production_position+1);
-		echo "moveTaskPosition = $res <br/>" . PHP_EOL;
 		return $task["id"];
 	}
 	
