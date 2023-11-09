@@ -5,6 +5,7 @@
 - list all tasks by due date
 
 - import estimate automatically exported from cadratin  
+	( root ) loginctl enable-linger <username>
+	( user )
 	cp and edit inotify/cadratin.{path,service} to ~/config/systemd/user/  
-	systemctl enable --user cadratin.path  
-	systemctl start --user cadratin.path  
+	systemctl enable --now --user cadratin.path  
