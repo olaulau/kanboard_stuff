@@ -153,8 +153,11 @@ abstract class KanboardTaskApiSvc
 			echo "EXCEPTION message : " . $exception->getMessage();
 		}
 		if($result instanceof ErrorResponse) { /** @var ErrorResponse $result */
-			echo " ERROR RESPONSE message = " . $result->getMessage() . "<br/>" . PHP_EOL;
+			echo "ERROR RESPONSE message = " . $result->getMessage() . PHP_EOL;
 			return 0;
+		}
+		if($result === false) {
+			echo "unknown ERROR creating the task" . PHP_EOL;
 		}
 		
 		return $result;

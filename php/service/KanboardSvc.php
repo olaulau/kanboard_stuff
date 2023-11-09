@@ -37,7 +37,7 @@ abstract class KanboardSvc
 		// create task
 		$params = [
 			"project_id"	=> $project_id,
-			"title"			=> $data["Raison sociale"],
+			"title"			=> $data["Raison sociale"] . " " . "devis n° " . $data["Numéro nu"],
 			"description"	=> $data["Désignation"],
 			"color_id"		=> $color,
 			"column_id"		=> $estimate_column_id,
@@ -46,7 +46,7 @@ abstract class KanboardSvc
 		
 		$date = \DateTime::createFromFormat("d/m/Y", $data["Date pièce"]);
 		if($date !== false) {
-			$params["date_due"] = $date->format("Y-m-d");
+			$params["date_due"] = $date->format("Y-m-d") . " 00:00";
 		}
 		
 		$task_id = KanboardTaskApiSvc::createTask($params);
