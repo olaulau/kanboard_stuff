@@ -17,6 +17,7 @@ abstract class KanboardSvc
 		// remove old tasks (deleted estimates) to avoid duplicate reference
 		$tasks = KanboardTaskApiSvc::searchTasks("status:open column:$estimate_column_id ref:" . $data["Numéro nu"]);
 		foreach($tasks as $task) {
+			echo "removing old task id = {$task["id"]} reference = {$task["Numéro nu"]}" . PHP_EOL;
 			KanboardTaskApiSvc::removeTask($task["id"]);
 		}
 		
