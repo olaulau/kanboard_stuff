@@ -9,6 +9,3 @@ mv -f data/prod/error/*.csv data/prod/stock/
 # copy data
 cp data/devis/stock/* data/devis/
 cp data/prod/stock/* data/prod/
-
-# run script
-./inotify/cadratin_inotify.sh
