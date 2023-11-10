@@ -15,10 +15,10 @@ abstract class KanboardSvc
 		$project_id = $f3->get("kanboard.project_id");
 		$estimate_column_id = $f3->get("kanboard.estimate_column_id");
 		
-		// remove old tasks (deleted estimates) to avoid duplicate reference
-		$tasks = KanboardTaskApiSvc::searchTasks("status:open column:$estimate_column_id ref:" . $data["Numéro nu"]);
+		// remove deleted estimates to avoid duplicate reference
+		$tasks = KanboardTaskApiSvc::searchTasks("column:$estimate_column_id ref:" . $data["Numéro nu"]);
 		foreach($tasks as $task) {
-			echo "removing old task id = {$task["id"]} reference = {$task["Numéro nu"]}" . PHP_EOL;
+			echo "removing deleted estimate task id = {$task["id"]} reference = {$task["reference"]}" . PHP_EOL;
 			KanboardTaskApiSvc::removeTask($task["id"]);
 		}
 		
@@ -86,7 +86,7 @@ abstract class KanboardSvc
 		// find reference task
 		$reference = $data["N/référence"];
 		
-		$tasks = KanboardTaskApiSvc::searchTasks("status:open column:$estimate_column_id ref:$reference");
+		$tasks = KanboardTaskApiSvc::searchTasks("column:$estimate_column_id ref:$reference");
 		if($tasks === false) {
 			throw new ErrorException("ERROR while searching for reference task");
 		}
@@ -100,6 +100,12 @@ abstract class KanboardSvc
 		$task = $tasks[0];
 		echo "task id = {$task["id"]}" . PHP_EOL;
 		
+		// reopen task if needed
+		if(!empty($task["date_completed"])) {
+			echo "reopening old task id = {$task["id"]}" . PHP_EOL;
+			KanboardTaskApiSvc::openTask($task["id"], ["task_id"], ["task_id" => $task["id"]]);
+		}
+		
 		// calculate new position
 		$prod_tasks = KanboardTaskApiSvc::searchTasks("status:open column:$production_column_id");
 		$max_production_position = 0;
@@ -110,7 +116,8 @@ abstract class KanboardSvc
 		}
 		
 		// move task
-		$res = KanboardTaskApiSvc::moveTaskPosition($task["id"], $production_column_id, $max_production_position+1);
+		echo "moving task id = {$task["id"]} to production column" . PHP_EOL;
+		KanboardTaskApiSvc::moveTaskPosition($task["id"], $production_column_id, $max_production_position+1);
 		return $task["id"];
 	}
 	
