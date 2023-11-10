@@ -214,5 +214,17 @@ abstract class KanboardTaskApiSvc
 
 		return $result;
 	}
+	
+	
+	public static function closeTask (int $task_id)
+	{
+		$f3 = Base::instance();
+		$params = [
+			"task_id"		=> $task_id,
+		];
+		
+		$result = KanboardApiSvc::clientSendQuery("closeTask", ["task_id"], $params);
+		return $result;
+	}
 
 }

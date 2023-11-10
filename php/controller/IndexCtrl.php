@@ -215,7 +215,7 @@ class IndexCtrl
 	}
 	
 
-	public static function cadratinEstimateGET ($f3)
+	public static function cadratinEstimateCLI ($f3)
 	{
 		// cleanup
 		// $estimate_column_id = $f3->get("kanboard.estimate_column_id");
@@ -245,7 +245,7 @@ class IndexCtrl
 	}
 	
 	
-	public static function cadratinProductionGET ($f3)
+	public static function cadratinProductionCLI ($f3)
 	{
 		$filename = $f3->get("PARAMS.filename");
 		$sort_subdir = CadratinSvc::$cadratin_done_subdir;
@@ -268,5 +268,18 @@ class IndexCtrl
 			);
 		}
 	}
-
+	
+	
+	public static function kanboardEstimatesPurgeCLI ($f3)
+	{
+		try {
+			$res = KanboardSvc::purgeEstimates();
+			if($res !== true) {
+				throw(new ErrorException("unknown purge error"));
+			}
+		}
+		catch(Exception $ex) {
+			echo $ex->getMessage() . PHP_EOL;
+		}
+	}
 }

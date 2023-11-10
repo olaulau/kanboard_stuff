@@ -2,6 +2,7 @@
 namespace service;
 
 use Base;
+use DateTime;
 use ErrorException;
 
 abstract class KanboardSvc
@@ -113,4 +114,33 @@ abstract class KanboardSvc
 		return $task["id"];
 	}
 	
+	
+	public static function purgeEstimates () : bool
+	{
+		// prepare data
+		$f3 = Base::instance();
+		$estimate_column_id = $f3->get("kanboard.estimate_column_id");
+		$estimate_months_expire = $f3->get("kanboard.estimate_months_expire");
+		
+		// get all opened estimate tasks
+		$tasks = KanboardTaskApiSvc::searchTasks("status:open column:$estimate_column_id");
+		
+		// close old estimates
+		$result = true;
+		$now = new DateTime();
+		foreach($tasks as $task) {
+			if(!empty($task["date_due"])) {
+				$d = new DateTime("@" . $task["date_due"]);
+				if($d->diff($now)->m >= $estimate_months_expire) {
+					echo "closing old task id = {$task["id"]}" . PHP_EOL;
+					$res = KanboardTaskApiSvc::closeTask($task["id"]);
+					if($res === false) {
+						$result = false;
+					}
+				}
+			}
+		}
+		
+		return $result;
+	}
 }

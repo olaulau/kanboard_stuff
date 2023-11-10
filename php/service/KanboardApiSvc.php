@@ -73,7 +73,7 @@ abstract class KanboardApiSvc
 			return 0;
 		}
 		if($result instanceof ErrorResponse) { /** @var ErrorResponse $result */
-			echo "ERROR RESPONSE message = " . $result->getMessage() . "<br/>" . PHP_EOL;
+			echo "ERROR RESPONSE message = " . $result->getMessage() . PHP_EOL;
 			return 0;
 		}
 
