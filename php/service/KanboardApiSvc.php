@@ -34,25 +34,8 @@ abstract class KanboardApiSvc
 		$client = new Client($kanboard_rpc_url, $headers);
 		return $client;
 	}
-
-
-	public static function getVersion () : string
-	{
-		$client = self::getClient();
-		$params = [];
-		$client->query("getVersion", $params, $result);
-
-		try {
-			$client->send();
-		}
-		catch (Exception $exception) {
-			echo "EXCEPTION message : " . $exception->getMessage();
-		}
-
-		return $result;
-	}
-
-
+	
+	
 	public static function clientSendQuery ($method, $required_params, $params)
 	{
 		// check required params
@@ -76,6 +59,23 @@ abstract class KanboardApiSvc
 			echo "ERROR RESPONSE message = " . $result->getMessage() . PHP_EOL;
 			return 0;
 		}
+		
+		return $result;
+	}
+	
+	
+	public static function getVersion () : string
+	{
+		$client = self::getClient();
+		$params = [];
+		$client->query("getVersion", $params, $result);
+
+		try {
+			$client->send();
+		}
+		catch (Exception $exception) {
+			echo "EXCEPTION message : " . $exception->getMessage();
+		}
 
 		return $result;
 	}
@@ -91,6 +91,16 @@ abstract class KanboardApiSvc
 		];
 
 		$result = self::clientSendQuery("getUserByName", $required_params, $params);
+		return $result;
+	}
+
+
+	public static function getMe ($user_name)
+	{
+		$required_params = [];
+		$params = [];
+
+		$result = self::clientSendQuery("getMe", $required_params, $params);
 		return $result;
 	}
 

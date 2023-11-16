@@ -38,7 +38,7 @@ abstract class KanboardSvc
 		// create task
 		$params = [
 			"project_id"	=> $project_id,
-			"title"			=> $data["Raison sociale"] . " " . "devis n° " . $data["Numéro nu"],
+			"title"			=> "* " . $data["Raison sociale"] . " " . "devis n° " . $data["Numéro nu"],
 			"description"	=> $data["Désignation"],
 			"color_id"		=> $color,
 			"column_id"		=> $estimate_column_id,
@@ -80,12 +80,12 @@ abstract class KanboardSvc
 	{
 		// prepare data
 		$f3 = Base::instance();
+		$project_id = $f3->get("kanboard.project_id");
 		$estimate_column_id = $f3->get("kanboard.estimate_column_id");
 		$production_column_id = $f3->get("kanboard.production_column_id");
 		
 		// find reference task
 		$reference = $data["N/référence"];
-		
 		$tasks = KanboardTaskApiSvc::searchTasks("column:$estimate_column_id ref:$reference");
 		if($tasks === false) {
 			throw new ErrorException("ERROR while searching for reference task");
@@ -96,29 +96,32 @@ abstract class KanboardSvc
 		if(count($tasks) > 1) {
 			throw new ErrorException("too many tasks reference = $reference");
 		}
+		$estimate_task = $tasks[0];
 		
-		$task = $tasks[0];
-		echo "task id = {$task["id"]}" . PHP_EOL;
+		// close estimate task
+		$res = KanboardTaskApiSvc::closeTask($estimate_task["id"]);
 		
-		// reopen task if needed
-		if(!empty($task["date_completed"])) {
-			echo "reopening old task id = {$task["id"]}" . PHP_EOL;
-			KanboardTaskApiSvc::openTask($task["id"], ["task_id"], ["task_id" => $task["id"]]);
+		// duplicate estimate task
+		$production_task_id = KanboardTaskApiSvc::duplicateTaskToColumn($estimate_task["id"], $project_id, $production_column_id);
+		echo "production task id = {$production_task_id}" . PHP_EOL;
+		
+		// get production task data
+		$production_task = KanboardTaskApiSvc::getTaskById($production_task_id);
+		
+		// update task data
+		$params["id"] = $production_task["id"];
+		if(!empty($production_task["V/référence"])) {
+			$params["title"] = "{$production_task["Raison sociale"]} devis n° {$production_task["N/référence"]}} cde n° {$production_task["V/référence"]}}";
 		}
-		
-		// calculate new position
-		$prod_tasks = KanboardTaskApiSvc::searchTasks("status:open column:$production_column_id");
-		$max_production_position = 0;
-		foreach($prod_tasks as $prod_task) {
-			if($prod_task["position"] > $max_production_position) {
-				$max_production_position = $prod_task["position"];
+		if(!empty($production_task["Date de livraison prévision produit N°1"])) {
+			$date = \DateTime::createFromFormat("d/m/Y", $production_task["Date de livraison prévision produit N°1"]);
+			if($date !== false) {
+				$params["date_due"] = $date->format("Y-m-d") . " 00:00";
 			}
 		}
+		KanboardTaskApiSvc::updateTask($params);
 		
-		// move task
-		echo "moving task id = {$task["id"]} to production column" . PHP_EOL;
-		KanboardTaskApiSvc::moveTaskPosition($task["id"], $production_column_id, $max_production_position+1);
-		return $task["id"];
+		return $estimate_task["id"];
 	}
 	
 	

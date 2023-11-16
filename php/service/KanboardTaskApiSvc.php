@@ -34,6 +34,19 @@ abstract class KanboardTaskApiSvc
 	}
 	
 	
+	public static function getTaskById (int $task_id)
+	{
+		$required_params = [
+			"task_id",
+		];
+		$params = [
+			"task_id" => $task_id,
+		];
+		$result = KanboardApiSvc::clientSendQuery("getTask", $required_params, $params);
+		return $result;
+	}
+	
+	
 	public static function getTaskByReference (int $reference)
 	{
 		$f3 = Base::instance();
@@ -87,6 +100,21 @@ abstract class KanboardTaskApiSvc
 	}
 	
 	
+	private static function getAllTasksFromColumn (int $column_id) : array
+	{
+		$f3 = Base::instance();
+		$all_tasks = self::getAllTasksFromProject($f3->get("kanboard.project_id"));
+
+		$res = [];
+		foreach($all_tasks as $task) {
+			if($task["column_id"] === $column_id) {
+				$res [] = $task;
+			}
+		}
+		return $res;
+	}
+	
+	
 	public static function removeTask (int $task_id) : bool
 	{
 		$params = [
@@ -109,21 +137,6 @@ abstract class KanboardTaskApiSvc
 		return $result;
 	}
 
-	
-	private static function getAllTasksFromColumn (int $column_id) : array
-	{
-		$f3 = Base::instance();
-		$all_tasks = self::getAllTasksFromProject($f3->get("kanboard.project_id"));
-
-		$res = [];
-		foreach($all_tasks as $task) {
-			if($task["column_id"] === $column_id) {
-				$res [] = $task;
-			}
-		}
-		return $res;
-	}
-	
 
 	public static function removeAllTasksFromColumn (int $column_id)
 	{
@@ -218,7 +231,6 @@ abstract class KanboardTaskApiSvc
 	
 	public static function closeTask (int $task_id)
 	{
-		$f3 = Base::instance();
 		$params = [
 			"task_id"		=> $task_id,
 		];
@@ -230,12 +242,37 @@ abstract class KanboardTaskApiSvc
 
 	public static function openTask (int $task_id)
 	{
-		$f3 = Base::instance();
 		$params = [
 			"task_id"		=> $task_id,
 		];
 		
 		$result = KanboardApiSvc::clientSendQuery("openTask", ["task_id"], $params);
+		return $result;
+	}
+	
+	
+	public static function updateTask (array $params)
+	{
+		$required_params = [
+			"id",
+		];
+		$result = KanboardApiSvc::clientSendQuery("updateTask", $required_params, $params);
+		return $result;
+	}
+
+
+	public static function duplicateTaskToColumn ($task_id, $project_id, $column_id)
+	{
+		$required_params = [
+			"task_id",
+			"project_id",
+		];
+		$params = [
+			"task_id" => 		$task_id,
+			"project_id" => 	$project_id,
+			"column_id" => 		$column_id,
+		];
+		$result = KanboardApiSvc::clientSendQuery("duplicateTaskToProject", $required_params, $params);
 		return $result;
 	}
 

@@ -9,6 +9,7 @@
 	( user )
 	cp and edit inotify/cadratin.{path,service} to ~/config/systemd/user/  
 	systemctl enable --now --user cadratin.path  
+	./inotify/cadratin_inotify.sh  
 
 - close old estimates  
 	crontab -e  
