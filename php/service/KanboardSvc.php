@@ -110,8 +110,9 @@ abstract class KanboardSvc
 		
 		// update task data
 		$params["id"] = $production_task["id"];
+		$params["title"] = "{$production_task["Raison sociale"]} devis n° {$production_task["N/référence"]}}";
 		if(!empty($production_task["V/référence"])) {
-			$params["title"] = "{$production_task["Raison sociale"]} devis n° {$production_task["N/référence"]}} cde n° {$production_task["V/référence"]}}";
+			$params["title"] .= " cde n° {$production_task["V/référence"]}}";
 		}
 		if(!empty($production_task["Date de livraison prévision produit N°1"])) {
 			$date = \DateTime::createFromFormat("d/m/Y", $production_task["Date de livraison prévision produit N°1"]);
