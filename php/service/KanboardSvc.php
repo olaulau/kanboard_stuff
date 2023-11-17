@@ -8,7 +8,7 @@ use ErrorException;
 abstract class KanboardSvc
 {
 
-	public static function addCadratinEstimate (array $data) : int
+	public static function addCadratinEstimate (array $csv) : int
 	{
 		// prepare data
 		$f3 = Base::instance();
@@ -16,7 +16,7 @@ abstract class KanboardSvc
 		$estimate_column_id = $f3->get("kanboard.estimate_column_id");
 		
 		// remove deleted estimates to avoid duplicate reference
-		$tasks = KanboardTaskApiSvc::searchTasks("column:$estimate_column_id ref:" . $data["Numéro nu"]);
+		$tasks = KanboardTaskApiSvc::searchTasks("column:$estimate_column_id ref:" . $csv["Numéro nu"]);
 		foreach($tasks as $task) {
 			echo "removing deleted estimate task id = {$task["id"]} reference = {$task["reference"]}" . PHP_EOL;
 			KanboardTaskApiSvc::removeTask($task["id"]);
@@ -29,7 +29,7 @@ abstract class KanboardSvc
 				$codes_compta = [$codes_compta];
 			}
 			foreach($codes_compta as $code_compta) {
-				if(strpos($data["Code compta"], strval($code_compta)) === 0) {
+				if(strpos($csv["Code compta"], strval($code_compta)) === 0) {
 					break 2;
 				}
 			}
@@ -38,14 +38,14 @@ abstract class KanboardSvc
 		// create task
 		$params = [
 			"project_id"	=> $project_id,
-			"title"			=> "* " . $data["Raison sociale"] . " " . "devis n° " . $data["Numéro nu"],
-			"description"	=> $data["Désignation"],
+			"title"			=> "* " . $csv["Raison sociale"] . " " . "devis n° " . $csv["Numéro nu"],
+			"description"	=> $csv["Désignation"],
 			"color_id"		=> $color,
 			"column_id"		=> $estimate_column_id,
-			"reference"		=> $data["Numéro nu"],
+			"reference"		=> $csv["Numéro nu"],
 		];
 		
-		$date = \DateTime::createFromFormat("d/m/Y", $data["Date pièce"]);
+		$date = \DateTime::createFromFormat("d/m/Y", $csv["Date pièce"]);
 		if($date !== false) {
 			$params["date_due"] = $date->format("Y-m-d") . " 00:00";
 		}
@@ -62,11 +62,11 @@ abstract class KanboardSvc
 		*/
 		
 		// create comment
-		if(!empty($data["Edition éléments produit N°1"])) {
+		if(!empty($csv["Edition éléments produit N°1"])) {
 			$params = [
 				"task_id" => $task_id,
 				"user_id" => $user_id /*$user["id"]*/,
-				"content" => $data["Edition éléments produit N°1"],
+				"content" => $csv["Edition éléments produit N°1"],
 			];
 			$comment_id = KanboardTaskApiSvc::createComment($params);
 			echo "comment id = $comment_id" . PHP_EOL;
@@ -76,7 +76,7 @@ abstract class KanboardSvc
 	}
 
 	
-	public static function addCadratinProduction (array $data) : int
+	public static function addCadratinProduction (array $csv) : int
 	{
 		// prepare data
 		$f3 = Base::instance();
@@ -85,7 +85,7 @@ abstract class KanboardSvc
 		$production_column_id = $f3->get("kanboard.production_column_id");
 		
 		// find reference task
-		$reference = $data["N/référence"];
+		$reference = $csv["N/référence"];
 		$tasks = KanboardTaskApiSvc::searchTasks("column:$estimate_column_id ref:$reference");
 		if($tasks === false) {
 			throw new ErrorException("ERROR while searching for reference task");
@@ -110,12 +110,12 @@ abstract class KanboardSvc
 		
 		// update task data
 		$params["id"] = $production_task["id"];
-		$params["title"] = "{$production_task["Raison sociale"]} devis n° {$production_task["N/référence"]}}";
-		if(!empty($production_task["V/référence"])) {
-			$params["title"] .= " cde n° {$production_task["V/référence"]}}";
+		$params["title"] = "{$csv["Raison sociale"]} devis n° {$reference}";
+		if(!empty($csv["V/référence"])) {
+			$params["title"] .= " cde n° {$csv["V/référence"]}}";
 		}
 		if(!empty($production_task["Date de livraison prévision produit N°1"])) {
-			$date = \DateTime::createFromFormat("d/m/Y", $production_task["Date de livraison prévision produit N°1"]);
+			$date = \DateTime::createFromFormat("d/m/Y", $csv["Date de livraison prévision produit N°1"]);
 			if($date !== false) {
 				$params["date_due"] = $date->format("Y-m-d") . " 00:00";
 			}
