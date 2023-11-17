@@ -112,7 +112,7 @@ abstract class KanboardSvc
 		$params["id"] = $production_task["id"];
 		$params["title"] = "{$csv["Raison sociale"]} devis n° {$reference}";
 		if(!empty($csv["V/référence"])) {
-			$params["title"] .= " cde n° {$csv["V/référence"]}}";
+			$params["title"] .= " cde n° {$csv["V/référence"]}";
 		}
 		if(!empty($production_task["Date de livraison prévision produit N°1"])) {
 			$date = \DateTime::createFromFormat("d/m/Y", $csv["Date de livraison prévision produit N°1"]);
