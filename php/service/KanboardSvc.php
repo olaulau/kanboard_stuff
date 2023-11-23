@@ -117,7 +117,7 @@ abstract class KanboardSvc
 		if(!empty($csv["V/référence"])) {
 			$params["title"] .= " cde n° {$csv["V/référence"]}";
 		}
-		if(!empty($production_task["Date de livraison prévision produit N°1"])) {
+		if(!empty($csv["Date de livraison prévision produit N°1"])) {
 			$date = \DateTime::createFromFormat("d/m/Y", $csv["Date de livraison prévision produit N°1"]);
 			if($date !== false) {
 				$params["date_due"] = $date->format("Y-m-d") . " 00:00";
