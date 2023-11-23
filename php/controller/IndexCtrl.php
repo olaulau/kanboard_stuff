@@ -223,6 +223,9 @@ class IndexCtrl
 		// die;
 		
 		$filename = $f3->get("PARAMS.filename");
+		echo PHP_EOL;
+		echo " devis : $filename" . PHP_EOL;
+		
 		$sort_subdir = CadratinSvc::$cadratin_done_subdir;
 		try {
 			$data = CadratinSvc::handleEstimateFile($filename);
@@ -238,8 +241,8 @@ class IndexCtrl
 		}
 		finally {
 			rename(
-				"data/" . CadratinSvc::$cadratin_estimate_subdir . "/" . $filename,
-				"data/" . CadratinSvc::$cadratin_estimate_subdir . "/$sort_subdir/" . $filename
+				"data/" . CadratinSvc::$cadratin_estimate_subdir . "/$filename",
+				"data/" . CadratinSvc::$cadratin_estimate_subdir . "/$sort_subdir/$filename"
 			);
 		}
 	}
@@ -248,6 +251,9 @@ class IndexCtrl
 	public static function cadratinProductionCLI ($f3)
 	{
 		$filename = $f3->get("PARAMS.filename");
+		echo PHP_EOL;
+		echo " prod : $filename" . PHP_EOL;
+		
 		$sort_subdir = CadratinSvc::$cadratin_done_subdir;
 		try {
 			$data = CadratinSvc::handleProdFile($filename);
@@ -263,8 +269,8 @@ class IndexCtrl
 		}
 		finally {
 			rename(
-				"data/" . CadratinSvc::$cadratin_production_subdir . "/" . $filename,
-				"data/" . CadratinSvc::$cadratin_production_subdir . "/$sort_subdir/" . $filename
+				"data/" . CadratinSvc::$cadratin_production_subdir . "/$filename",
+				"data/" . CadratinSvc::$cadratin_production_subdir . "/$sort_subdir/$filename"
 			);
 		}
 	}

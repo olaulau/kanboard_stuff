@@ -16,7 +16,9 @@ abstract class KanboardSvc
 		$estimate_column_id = $f3->get("kanboard.estimate_column_id");
 		
 		// remove deleted estimates to avoid duplicate reference
-		$tasks = KanboardTaskApiSvc::searchTasks("column:$estimate_column_id ref:" . $csv["Numéro nu"]);
+		$estimate_number = $csv["Numéro nu"];
+		echo "devis n° {$estimate_number}" . PHP_EOL;
+		$tasks = KanboardTaskApiSvc::searchTasks("column:$estimate_column_id ref:" . $estimate_number);
 		foreach($tasks as $task) {
 			echo "removing deleted estimate task id = {$task["id"]} reference = {$task["reference"]}" . PHP_EOL;
 			KanboardTaskApiSvc::removeTask($task["id"]);
@@ -38,11 +40,11 @@ abstract class KanboardSvc
 		// create task
 		$params = [
 			"project_id"	=> $project_id,
-			"title"			=> "* " . $csv["Raison sociale"] . " " . "devis n° " . $csv["Numéro nu"],
+			"title"			=> "* " . $csv["Raison sociale"] . " " . "devis n° " . $estimate_number,
 			"description"	=> $csv["Désignation"],
 			"color_id"		=> $color,
 			"column_id"		=> $estimate_column_id,
-			"reference"		=> $csv["Numéro nu"],
+			"reference"		=> $estimate_number,
 		];
 		
 		$date = \DateTime::createFromFormat("d/m/Y", $csv["Date pièce"]);
@@ -51,7 +53,7 @@ abstract class KanboardSvc
 		}
 		
 		$task_id = KanboardTaskApiSvc::createTask($params);
-		echo "task id = $task_id" . PHP_EOL;
+		echo "estimate task id = {$task_id}" . PHP_EOL;
 		
 		// query current user infos
 		//@see https://docs.kanboard.org/v1/api/me_procedures/#getme
@@ -69,7 +71,7 @@ abstract class KanboardSvc
 				"content" => $csv["Edition éléments produit N°1"],
 			];
 			$comment_id = KanboardTaskApiSvc::createComment($params);
-			echo "comment id = $comment_id" . PHP_EOL;
+			echo "comment id = {$comment_id}" . PHP_EOL;
 		}
 		
 		return $task_id;
@@ -85,16 +87,17 @@ abstract class KanboardSvc
 		$production_column_id = $f3->get("kanboard.production_column_id");
 		
 		// find reference task
-		$reference = $csv["N/référence"];
-		$tasks = KanboardTaskApiSvc::searchTasks("column:$estimate_column_id ref:$reference");
+		$estimate_number = $csv["N/référence"];
+		echo "devis n° {$estimate_number}" . PHP_EOL;
+		$tasks = KanboardTaskApiSvc::searchTasks("column:$estimate_column_id ref:$estimate_number");
 		if($tasks === false) {
 			throw new ErrorException("ERROR while searching for reference task");
 		}
 		if(count($tasks) === 0) {
-			throw new ErrorException("can't find task reference = $reference");
+			throw new ErrorException("can't find task reference = $estimate_number");
 		}
 		if(count($tasks) > 1) {
-			throw new ErrorException("too many tasks reference = $reference");
+			throw new ErrorException("too many tasks reference = $estimate_number");
 		}
 		$estimate_task = $tasks[0];
 		
@@ -110,7 +113,7 @@ abstract class KanboardSvc
 		
 		// update task data
 		$params["id"] = $production_task["id"];
-		$params["title"] = "** {$csv["Raison sociale"]} devis n° {$reference}";
+		$params["title"] = "** {$csv["Raison sociale"]} devis n° {$estimate_number}";
 		if(!empty($csv["V/référence"])) {
 			$params["title"] .= " cde n° {$csv["V/référence"]}";
 		}
