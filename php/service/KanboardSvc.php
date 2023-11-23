@@ -110,7 +110,7 @@ abstract class KanboardSvc
 		
 		// update task data
 		$params["id"] = $production_task["id"];
-		$params["title"] = "{$csv["Raison sociale"]} devis n° {$reference}";
+		$params["title"] = "** {$csv["Raison sociale"]} devis n° {$reference}";
 		if(!empty($csv["V/référence"])) {
 			$params["title"] .= " cde n° {$csv["V/référence"]}";
 		}
