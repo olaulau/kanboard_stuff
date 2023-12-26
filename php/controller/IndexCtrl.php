@@ -1,6 +1,7 @@
 <?php
 namespace controller;
 
+use Base;
 use Datto\JsonRpc\Http\Client;
 use Datto\JsonRpc\Http\Exceptions\HttpException;
 use Datto\JsonRpc\Responses\ErrorResponse;
@@ -288,4 +289,12 @@ class IndexCtrl
 			echo $ex->getMessage() . PHP_EOL;
 		}
 	}
+	
+	
+	public static function testGET ($f3) {
+		////
+		
+		die;
+	}
+	
 }

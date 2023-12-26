@@ -9,7 +9,7 @@ abstract class CadratinSvc
 {
 	
 	public static $csv_field_separator = ";";
-	public static $csv_line_return_char = "¶";
+	public static $csv_field_line_return = "¶";
 	public static $cadratin_estimate_subdir = "devis";
 	public static $cadratin_production_subdir = "prod";
 	public static $cadratin_done_subdir = "done";
@@ -38,12 +38,27 @@ abstract class CadratinSvc
 		
 		// make values have correct line return
 		foreach($data[1] as &$val) {
-			$val = trim(str_replace(self::$csv_line_return_char, PHP_EOL, $val));
+			$val = trim(str_replace(self::$csv_field_line_return, PHP_EOL, $val));
 		}
 		
 		// assemble rows into an associative array
-		if(count($data[0]) !== count($data[1])) {
-			throw new ErrorException("incorrect CSV format (not the same number of columns in both rows) : probably a field separator ('" . self::$csv_field_separator . "') in the em-mail field !");
+		if(count($data[0]) !== count($data[1])) { // not same number of columns in both rows
+			$subjet = "incorrect CSV format";
+			$message = <<< EOT
+			incorrect CSV format (not the same number of columns in both rows)
+			probably a field separator ('
+			EOT;
+			$message .= self::$csv_field_separator;
+			$message .= <<< EOT
+			') in the e-mail field !
+			Please :
+			- first fix the estimate in cadratin
+			- then duplicate it
+			- finally remove the original one
+			EOT;
+			$attachments = [$csv_file];
+			KanboardSvc::send_email($subjet, nl2br($message), $attachments);
+			throw new ErrorException($message);
 		}
 		$data = array_combine($data[0], $data[1]);
 

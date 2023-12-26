@@ -40,7 +40,7 @@ abstract class KanboardSvc
 		// create task
 		$params = [
 			"project_id"	=> $project_id,
-			"title"			=> "* " . $csv["Raison sociale"] . " " . "devis n° " . $estimate_number,
+			"title"			=> "* {$csv["Raison sociale"]} devis n° {$estimate_number}",
 			"description"	=> $csv["Désignation"],
 			"color_id"		=> $color,
 			"column_id"		=> $estimate_column_id,
@@ -50,6 +50,9 @@ abstract class KanboardSvc
 		$date = \DateTime::createFromFormat("d/m/Y", $csv["Date pièce"]);
 		if($date !== false) {
 			$params["date_due"] = $date->format("Y-m-d") . " 00:00";
+		}
+		else {
+			echo "'Date pièce' is empty" . PHP_EOL;
 		}
 		
 		$task_id = KanboardTaskApiSvc::createTask($params);
@@ -156,5 +159,49 @@ abstract class KanboardSvc
 		}
 		
 		return $result;
+	}
+	
+	
+	
+	public static function send_email ($subject, $message, $attachements=[]) {
+		$f3 = Base::instance();
+		
+		// send email to admin
+		$smtp = new \SMTP ( $f3->get("smtp.host"), $f3->get("smtp.port"), $f3->get("smtp.scheme"), $f3->get("smtp.login"), $f3->get("smtp.password") );
+		$smtp->set('Content-type', 'text/html; charset=UTF-8');
+		$smtp->set('Errors-to', $f3->get("smtp.sender"));
+		$smtp->set('From', $f3->get("smtp.sender"));
+		$smtp->set('To', $f3->get("smtp.admin_address"));
+		$smtp->set('Subject', "cadratin-kanboard : {$subject}");
+		
+		foreach($attachements as $attachment) {
+			$smtp->attach($attachment);
+		}
+
+		$content = <<<EOT
+<html>
+<head>
+</head>
+<body>
+<p>
+Bonjour ;
+</p>
+<p>
+{$message}
+</p>
+<p>
+</p>
+-- <br/>
+<br/>
+impbot
+</body>
+</html>
+EOT;
+		
+		$res = $smtp->send($content, true); // returns TRUE or FALSE
+		if($res !== true) {
+			echo '<pre>' . $smtp->log() . '</pre>';
+			die;
+		}
 	}
 }
