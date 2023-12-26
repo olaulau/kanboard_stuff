@@ -52,7 +52,7 @@ abstract class CadratinSvc
 			$message .= <<< EOT
 			') in the e-mail field !
 			Please :
-			- first fix the estimate in cadratin
+			- first fix the estimate/prod in cadratin
 			- then duplicate it
 			- finally remove the original one
 			EOT;

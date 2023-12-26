@@ -55,8 +55,8 @@ abstract class KanboardSvc
 			echo "'Date pièce' is empty" . PHP_EOL;
 		}
 		
-		$task_id = KanboardTaskApiSvc::createTask($params);
-		echo "estimate task id = {$task_id}" . PHP_EOL;
+		$estimate_task_id = KanboardTaskApiSvc::createTask($params);
+		echo "estimate task id = {$estimate_task_id}" . PHP_EOL;
 		
 		// query current user infos
 		//@see https://docs.kanboard.org/v1/api/me_procedures/#getme
@@ -69,7 +69,7 @@ abstract class KanboardSvc
 		// create comment
 		if(!empty($csv["Edition éléments produit N°1"])) {
 			$params = [
-				"task_id" => $task_id,
+				"task_id" => $estimate_task_id,
 				"user_id" => $user_id /*$user["id"]*/,
 				"content" => $csv["Edition éléments produit N°1"],
 			];
@@ -77,7 +77,7 @@ abstract class KanboardSvc
 			echo "comment id = {$comment_id}" . PHP_EOL;
 		}
 		
-		return $task_id;
+		return $estimate_task_id;
 	}
 
 	
@@ -96,27 +96,43 @@ abstract class KanboardSvc
 		if($tasks === false) {
 			throw new ErrorException("ERROR while searching for reference task");
 		}
-		if(count($tasks) === 0) {
-			throw new ErrorException("can't find task reference = $estimate_number");
-		}
 		if(count($tasks) > 1) {
-			throw new ErrorException("too many tasks reference = $estimate_number");
+			throw new ErrorException("BUG : too many tasks reference = $estimate_number");
 		}
-		$estimate_task = $tasks[0];
+		if(count($tasks) === 0) { // didn't find estimate task
+			// create empty estimate task
+			$params = [
+				"project_id"	=> $project_id,
+				"title"			=> "* {$csv["Raison sociale"]} devis n° {$estimate_number}",
+				"color_id"		=> "grey",
+				"column_id"		=> $estimate_column_id,
+				"reference"		=> $estimate_number,
+			];
+			
+			$date = \DateTime::createFromFormat("d/m/Y", $csv["Date de livraison prévision produit N°1"]);
+			if($date !== false) {
+				$params["date_due"] = $date->format("Y-m-d") . " 00:00";
+			}
+			
+			$estimate_task_id = KanboardTaskApiSvc::createTask($params);
+			echo "empty estimate task id = {$estimate_task_id}" . PHP_EOL;
+		}
+		else {
+			$estimate_task_id = $tasks[0]["id"];
+		}
 		
 		// close estimate task
-		$res = KanboardTaskApiSvc::closeTask($estimate_task["id"]);
+		$res = KanboardTaskApiSvc::closeTask($estimate_task_id);
 		
-		// duplicate estimate task
-		$production_task_id = KanboardTaskApiSvc::duplicateTaskToColumn($estimate_task["id"], $project_id, $production_column_id);
+		// create prod task from estimate duplication
+		$production_task_id = KanboardTaskApiSvc::duplicateTaskToColumn($estimate_task_id, $project_id, $production_column_id);
 		echo "production task id = {$production_task_id}" . PHP_EOL;
 		
-		// get production task data
-		$production_task = KanboardTaskApiSvc::getTaskById($production_task_id);
-		
 		// update task data
-		$params["id"] = $production_task["id"];
-		$params["title"] = "** {$csv["Raison sociale"]} devis n° {$estimate_number}";
+		$params = [
+			"id"	=> $production_task_id,
+			"title"	=> "** {$csv["Raison sociale"]} devis n° {$estimate_number}",
+		];
 		if(!empty($csv["V/référence"])) {
 			$params["title"] .= " cde n° {$csv["V/référence"]}";
 		}
@@ -128,7 +144,20 @@ abstract class KanboardSvc
 		}
 		KanboardTaskApiSvc::updateTask($params);
 		
-		return $estimate_task["id"];
+		// handle special cases
+		if(count($tasks) === 0) {
+			// send email
+			$subjet = "couldn't find estimate task ref = {$estimate_number}";
+			$task_url_prefix = $f3->get("kanboard.url") . "/?controller=TaskViewController&action=show&task_id=";
+			$message = <<< EOT
+			an <a href="{$task_url_prefix}{$estimate_task_id}">empty estimate task</a> has been created, you have to fill-it.
+			also, an <a href="{$task_url_prefix}{$production_task_id}">empty production task</a> has been created, you have to fill-it too.
+			EOT;
+			KanboardSvc::send_email($subjet, nl2br($message));
+			throw new ErrorException($subjet);
+		}
+		
+		return $production_task_id;
 	}
 	
 	
@@ -198,7 +227,7 @@ impbot
 </html>
 EOT;
 		
-		$res = $smtp->send($content, true); // returns TRUE or FALSE
+		$res = $smtp->send($content, true);
 		if($res !== true) {
 			echo '<pre>' . $smtp->log() . '</pre>';
 			die;
