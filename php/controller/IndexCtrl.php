@@ -292,8 +292,6 @@ class IndexCtrl
 	
 	
 	public static function testGET ($f3) {
-		////
-		
 		die;
 	}
 	

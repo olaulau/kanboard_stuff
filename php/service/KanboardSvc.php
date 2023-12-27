@@ -147,14 +147,11 @@ abstract class KanboardSvc
 		// handle special cases
 		if(count($tasks) === 0) {
 			// send email
-			$subjet = "couldn't find estimate task ref = {$estimate_number}";
+			$subject = $f3->get("DICT.cant_find_estimate_task.subject", $estimate_number);
 			$task_url_prefix = $f3->get("kanboard.url") . "/?controller=TaskViewController&action=show&task_id=";
-			$message = <<< EOT
-			an <a href="{$task_url_prefix}{$estimate_task_id}">empty estimate task</a> has been created, you have to fill-it.
-			also, an <a href="{$task_url_prefix}{$production_task_id}">empty production task</a> has been created, you have to fill-it too.
-			EOT;
-			KanboardSvc::send_email($subjet, nl2br($message));
-			throw new ErrorException($subjet);
+			$message = $f3->get("DICT.cant_find_estimate_task.message", ["{$task_url_prefix}{$estimate_task_id}", "{$task_url_prefix}{$production_task_id}"]);
+			KanboardSvc::send_email($subject, nl2br($message));
+			throw new ErrorException($subject);
 		}
 		
 		return $production_task_id;

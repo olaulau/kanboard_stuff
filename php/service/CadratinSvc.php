@@ -43,21 +43,11 @@ abstract class CadratinSvc
 		
 		// assemble rows into an associative array
 		if(count($data[0]) !== count($data[1])) { // not same number of columns in both rows
-			$subjet = "incorrect CSV format";
-			$message = <<< EOT
-			incorrect CSV format (not the same number of columns in both rows)
-			probably a field separator ('
-			EOT;
-			$message .= self::$csv_field_separator;
-			$message .= <<< EOT
-			') in the e-mail field !
-			Please :
-			- first fix the estimate/prod in cadratin
-			- then duplicate it
-			- finally remove the original one
-			EOT;
+			// $subject = "incorrect CSV format";
+			$subject = $f3->get("DICT.incorrect_csv_format.subject");
+			$message = $f3->get("DICT.incorrect_csv_format.message", self::$csv_field_separator);
 			$attachments = [$csv_file];
-			KanboardSvc::send_email($subjet, nl2br($message), $attachments);
+			KanboardSvc::send_email($subject, nl2br($message), $attachments);
 			throw new ErrorException($message);
 		}
 		$data = array_combine($data[0], $data[1]);

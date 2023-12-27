@@ -32,3 +32,6 @@ do
 	base=`basename $file`
 	php index.php cadratin prod $base
 done
+
+# little tempo so that systemd path unit rate limit isn't reached, and the service doesn't fail.
+sleep 2
