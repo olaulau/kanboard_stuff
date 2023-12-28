@@ -43,7 +43,6 @@ abstract class CadratinSvc
 		
 		// assemble rows into an associative array
 		if(count($data[0]) !== count($data[1])) { // not same number of columns in both rows
-			// $subject = "incorrect CSV format";
 			$subject = $f3->get("DICT.incorrect_csv_format.subject");
 			$message = $f3->get("DICT.incorrect_csv_format.message", self::$csv_field_separator);
 			$attachments = [$csv_file];
