@@ -172,8 +172,8 @@ abstract class KanboardSvc
 		$result = true;
 		$now = new DateTime();
 		foreach($tasks as $task) {
-			if(!empty($task["date_due"])) {
-				$d = new DateTime("@" . $task["date_due"]);
+			if(!empty($task["date_creation"])) {
+				$d = new DateTime("@" . $task["date_creation"]);
 				if($d->diff($now)->m >= $estimate_months_expire) {
 					echo "closing old task id = {$task["id"]}" . PHP_EOL;
 					$res = KanboardTaskApiSvc::closeTask($task["id"]);
