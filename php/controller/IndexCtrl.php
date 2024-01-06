@@ -280,7 +280,7 @@ class IndexCtrl
 	public static function kanboardEstimatesPurgeCLI ($f3)
 	{
 		try {
-			$res = KanboardSvc::purgeEstimates();
+			$res = KanboardSvc::closeOldEstimates();
 			if($res !== true) {
 				throw(new ErrorException("unknown purge error"));
 			}

@@ -158,12 +158,12 @@ abstract class KanboardSvc
 	}
 	
 	
-	public static function purgeEstimates () : bool
+	public static function closeOldEstimates () : bool
 	{
 		// prepare data
 		$f3 = Base::instance();
 		$estimate_column_id = $f3->get("kanboard.estimate_column_id");
-		$estimate_months_expire = $f3->get("kanboard.estimate_months_expire");
+		$estimate_days_expire = $f3->get("kanboard.estimate_days_expire");
 		
 		// get all opened estimate tasks
 		$tasks = KanboardTaskApiSvc::searchTasks("status:open column:$estimate_column_id");
@@ -174,7 +174,7 @@ abstract class KanboardSvc
 		foreach($tasks as $task) {
 			if(!empty($task["date_creation"])) {
 				$d = new DateTime("@" . $task["date_creation"]);
-				if($d->diff($now)->m >= $estimate_months_expire) {
+				if($d->diff($now)->d > $estimate_days_expire) {
 					echo "closing old task id = {$task["id"]}" . PHP_EOL;
 					$res = KanboardTaskApiSvc::closeTask($task["id"]);
 					if($res === false) {
@@ -186,7 +186,6 @@ abstract class KanboardSvc
 		
 		return $result;
 	}
-	
 	
 	
 	public static function send_email ($subject, $message, $attachements=[]) {
