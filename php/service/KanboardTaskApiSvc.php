@@ -2,7 +2,6 @@
 namespace service;
 
 use Base;
-use Datto\JsonRpc\Http\Client;
 use Datto\JsonRpc\Responses\ErrorResponse;
 use ErrorException;
 use Exception;
@@ -117,23 +116,13 @@ abstract class KanboardTaskApiSvc
 	
 	public static function removeTask (int $task_id) : bool
 	{
+		$required_params = [
+			"task_id",
+		];
 		$params = [
 			"task_id" => $task_id,
 		];
-		$client = KanboardApiSvc::getClient();
-		$client->query("removeTask", $params, $result);
-
-		try {
-			$client->send();
-		}
-		catch (Exception $exception) {
-			echo "EXCEPTION message : " . $exception->getMessage();
-		}
-		if($result instanceof ErrorResponse) { /** @var ErrorResponse $result */
-			echo " ERROR RESPONSE message = " . $result->getMessage() . "<br/>" . PHP_EOL;
-			return 0;
-		}
-		
+		$result = KanboardApiSvc::clientSendQuery("removeTask", $required_params, $params);
 		return $result;
 	}
 

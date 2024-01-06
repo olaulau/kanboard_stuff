@@ -1,16 +1,10 @@
 <?php
 namespace controller;
 
-use Base;
-use Datto\JsonRpc\Http\Client;
-use Datto\JsonRpc\Http\Exceptions\HttpException;
-use Datto\JsonRpc\Responses\ErrorResponse;
 use ErrorException;
 use Exception;
 use service\CadratinSvc;
-use service\KanboardApiSvc;
 use service\KanboardSvc;
-use service\KanboardTaskApiSvc;
 
 class IndexCtrl
 {
@@ -42,7 +36,7 @@ class IndexCtrl
 	public static function migrateGET ($f3)
 	{
 		$db_in = new \DB\SQL('sqlite:'.$f3->get("db_in.file"));
-		$db_out = $f3->get("db_out"); /* @var $db_out \DB\SQL\Mapper */
+		$db_out = $f3->get("db"); /* @var $db_out \DB\SQL\Mapper */
 		
 		
 		// check db's connected
@@ -124,7 +118,7 @@ class IndexCtrl
 	
 	public static function priorityGET ($f3)
 	{
-		$db_out = $f3->get("db_out"); /* @var $db_in \DB\SQL\Mapper */
+		$db = $f3->get("db"); /* @var $db_in \DB\SQL\Mapper */
 		
 		$sql = '
 			SELECT		c.title AS étape, t.title AS titre, t.description, t.date_due as délai
@@ -136,7 +130,7 @@ class IndexCtrl
 				AND		c.project_id = ?
 			ORDER BY	t.date_due ASC, c.position ASC
 		';
-		$data = $db_out->exec($sql, [$f3->get("kanboard.project_id")]);
+		$data = $db->exec($sql, [$f3->get("kanboard.project_id")]);
 		
 		$data2 = [];
 		foreach ($data as $id => $row) {
@@ -282,7 +276,17 @@ class IndexCtrl
 		try {
 			$res = KanboardSvc::closeOldEstimates();
 			if($res !== true) {
-				throw(new ErrorException("unknown purge error"));
+				throw(new ErrorException("unknown error while tying to close old estimates"));
+			}
+		}
+		catch(Exception $ex) {
+			echo $ex->getMessage() . PHP_EOL;
+		}
+		
+		try {
+			$res = KanboardSvc::deleteDuplicateEstimates();
+			if($res !== true) {
+				throw(new ErrorException("unknown error while tying to delete duplicate estimates"));
 			}
 		}
 		catch(Exception $ex) {

@@ -3,6 +3,7 @@ namespace service;
 
 use Base;
 use DateTime;
+use DB\SQL;
 use ErrorException;
 
 abstract class KanboardSvc
@@ -186,6 +187,56 @@ abstract class KanboardSvc
 		
 		return $result;
 	}
+	
+	
+	public static function deleteDuplicateEstimates () : bool
+	{
+		// prepare data
+		$f3 = Base::instance();
+		$db = $f3->get("db"); /** @var SQL $db */
+		$estimate_column_id = $f3->get("kanboard.estimate_column_id");
+		
+		// find duplicate references in estimates
+		$sql = "
+		SELECT 		*
+		FROM		tasks
+		WHERE		column_id = ?
+			AND		reference IN
+		(
+			SELECT		reference
+			FROM		tasks
+			WHERE		column_id = ?
+				AND		reference IS NOT NULL
+				AND		reference <> ''
+			GROUP BY	reference
+			HAVING		COUNT(*) > 1
+			)
+		";
+		$params = [$estimate_column_id, $estimate_column_id];
+		$tasks = $db->exec($sql, $params);
+		
+		// group tasks by reference
+		$tasks_grouped = [];
+		foreach ($tasks as $element) {
+			$tasks_grouped [$element["reference"]] [] = $element;
+		}
+		
+		// close tasks so that it remains only one of each reference
+		$result = true;
+		foreach($tasks_grouped as $group) {
+			$nb = count($group);
+			for($i=0; $i<$nb-1; $i++) {
+				$task = $group[$i];
+				$res = KanboardTaskApiSvc::removeTask($task["id"]);
+				if($res === false) {
+					$result = false;
+				}
+			}
+		}
+		
+		return $result;
+	}
+	
 	
 	
 	public static function send_email ($subject, $message, $attachements=[]) {
