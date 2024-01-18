@@ -19,7 +19,7 @@ abstract class KanboardSvc
 		$estimate_number = intval($csv["Numéro nu"]);
 		echo "devis n° {$estimate_number}" . PHP_EOL;
 		if(empty($estimate_number)) {
-			throw new ErrorException("ERROR while analysing estimte number (numéro nu) which seems to be empty");
+			throw new ErrorException("ERROR while analyzing estimate number (numéro nu) which seems to be empty");
 		}
 		
 		// remove deleted estimates to avoid duplicate reference
@@ -94,9 +94,13 @@ abstract class KanboardSvc
 		$estimate_column_id = $f3->get("kanboard.estimate_column_id");
 		$production_column_id = $f3->get("kanboard.production_column_id");
 		
-		// find reference task
-		$estimate_number = $csv["N/référence"];
+		$estimate_number = intval($csv["N/référence"]);
 		echo "devis n° {$estimate_number}" . PHP_EOL;
+		if(empty($estimate_number)) {
+			throw new ErrorException("ERROR while analyzing estimate number (N/référence) which seems to be empty");
+		}
+		
+		// find reference task
 		$tasks = KanboardTaskApiSvc::searchTasks("column:$estimate_column_id ref:$estimate_number");
 		if($tasks === false) {
 			throw new ErrorException("ERROR while searching for reference task");
