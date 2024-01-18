@@ -16,9 +16,13 @@ abstract class KanboardSvc
 		$project_id = $f3->get("kanboard.project_id");
 		$estimate_column_id = $f3->get("kanboard.estimate_column_id");
 		
-		// remove deleted estimates to avoid duplicate reference
-		$estimate_number = $csv["Numéro nu"];
+		$estimate_number = intval($csv["Numéro nu"]);
 		echo "devis n° {$estimate_number}" . PHP_EOL;
+		if(empty($estimate_number)) {
+			throw new ErrorException("ERROR while analysing estimte number (numéro nu) which seems to be empty");
+		}
+		
+		// remove deleted estimates to avoid duplicate reference
 		$tasks = KanboardTaskApiSvc::searchTasks("column:$estimate_column_id ref:" . $estimate_number);
 		foreach($tasks as $task) {
 			echo "removing deleted estimate task id = {$task["id"]} reference = {$task["reference"]}" . PHP_EOL;

@@ -212,20 +212,15 @@ class IndexCtrl
 
 	public static function cadratinEstimateCLI ($f3)
 	{
-		// cleanup
-		// $estimate_column_id = $f3->get("kanboard.estimate_column_id");
-		// KanboardTaskApiSvc::removeAllTasksFromColumn($estimate_column_id);
-		// die;
-		
 		$filename = $f3->get("PARAMS.filename");
 		echo PHP_EOL;
 		echo " devis : $filename" . PHP_EOL;
 		
 		$sort_subdir = CadratinSvc::$cadratin_done_subdir;
 		try {
-			$data = CadratinSvc::handleEstimateFile($filename);
+			$data = CadratinSvc::handleEstimateFile ($filename);
 			
-			$task_id = KanboardSvc::addCadratinEstimate($data);
+			$task_id = KanboardSvc::addCadratinEstimate ($data);
 			if(empty($task_id)) {
 				throw(new ErrorException("cadratin error"));
 			}
@@ -251,9 +246,9 @@ class IndexCtrl
 		
 		$sort_subdir = CadratinSvc::$cadratin_done_subdir;
 		try {
-			$data = CadratinSvc::handleProdFile($filename);
+			$data = CadratinSvc::handleProdFile ($filename);
 			
-			$task_id = KanboardSvc::addCadratinProduction($data);
+			$task_id = KanboardSvc::addCadratinProduction ($data);
 			if(empty($task_id)) {
 				throw(new ErrorException("cadratin error"));
 			}
