@@ -47,8 +47,8 @@ require_once __DIR__.'/layout/head.phtml';
 		<?php
 		$today = new \DateTime();
 		$today_found = false;
-		foreach ($data2 as $date => $data) {
-		    $date = \DateTime::createFromFormat('Y-m-d', $date);
+		foreach ($data2 as $date_str => $data) {
+		    $date = \DateTime::createFromFormat('Y-m-d', $date_str);
 		    $diff = $today->diff($date);
 		    $date_class = 'success';
 		    if ($diff->invert === 1) {
@@ -86,8 +86,8 @@ require_once __DIR__.'/layout/head.phtml';
 				foreach ($data as $row) {
     				?>
     				<tr>
-    					<td><?= $row['étape'] ?></td>
-    					<td><?= $row['titre'] ?></td>
+    					<td><?= $columns [$row ['column_id']] ["title"] ?></td>
+    					<td><?= $row['title'] ?></td>
     					<td><?= nl2br(trim(str_replace("\n\n", "\n", $row['description']))) ?></td>
     				</tr>
     				<?php

@@ -103,5 +103,19 @@ abstract class KanboardApiSvc
 		$result = self::clientSendQuery("getMe", $required_params, $params);
 		return $result;
 	}
+	
+	
+	public static function getColumns ($project_id)
+	{
+		$required_params = [
+			"project_id"
+		];
+		$params = [
+			"project_id" => $project_id,
+		];
+
+		$result = self::clientSendQuery("getColumns", $required_params, $params);
+		return $result;
+	}
 
 }

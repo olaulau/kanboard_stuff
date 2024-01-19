@@ -4,7 +4,9 @@ namespace controller;
 use ErrorException;
 use Exception;
 use service\CadratinSvc;
+use service\KanboardApiSvc;
 use service\KanboardSvc;
+use service\KanboardTaskApiSvc;
 
 class IndexCtrl
 {
@@ -118,35 +120,52 @@ class IndexCtrl
 	
 	public static function priorityGET ($f3)
 	{
-		$db = $f3->get("db"); /* @var $db_in \DB\SQL\Mapper */
+		$f3->set("PAGE.title", "Planning par ordre de délai");
 		
-		$sql = '
-			SELECT		c.title AS étape, t.title AS titre, t.description, t.date_due as délai
-			FROM		tasks t
-			INNER JOIN	columns c
-				ON		t.column_id = c.id
-			WHERE		c.title  NOT LIKE "%FACTURATION%"
-				AND		t.date_due != ""
-				AND		c.project_id = ?
-			ORDER BY	t.date_due ASC, c.position ASC
-		';
-		$data = $db->exec($sql, [$f3->get("kanboard.project_id")]);
+		// get conf vars
+		$project_id = $f3->get("kanboard.project_id");
+		$invoice_column_id = $f3->get("kanboard.invoice_column_id");
 		
-		$data2 = [];
-		foreach ($data as $id => $row) {
-			if (!empty ($row['délai'])) {
-				$date = new \DateTime();
-				$date->setTimestamp ( $row['délai'] );
-				$real_date = $date->format('Y-m-d');
-				unset($row['délai']);
-				if (!isset ($data2[$real_date])) {
-					$data2[$real_date] = [];
+		// get column's tasks from API
+		$data = KanboardTaskApiSvc::searchTasks("project:$project_id");
+		
+		// get columns (indexed by id)
+		$columns = KanboardApiSvc::getColumns($project_id);
+		$columns = array_combine(array_column($columns, "id"), $columns);
+		$f3->set("columns", $columns);
+		
+		// filter data
+		$data = array_filter($data,
+			function ($row) use ($invoice_column_id) {
+				if(empty($row["date_due"])) {
+					return false;
 				}
-				$data2[$real_date][] = $row;
+				if($row["column_id"] == $invoice_column_id) {
+					return false;
+				}
+				return true;
 			}
+		);
+		
+		// sort data
+		$keys = array_column($data, 'date_due');
+		array_multisort($keys, SORT_ASC, $data);
+		
+		// reformat data for output
+		$data2 = [];
+		foreach ($data as $row) {
+			$date = new \DateTime ();
+			$date->setTimestamp ( $row ['date_due'] );
+			$date_str = $date->format ('Y-m-d');
+			if (!isset ($data2 [$date_str])) {
+				$data2 [$date_str] = [];
+			}
+			$data2 [$date_str] [] = $row;
 		}
 		ksort($data2);
+		$f3->set("data2", $data2);
 		
+		// translations arrays
 		$months = [
 			'en' => [
 				'January',
@@ -177,6 +196,7 @@ class IndexCtrl
 				'Décembre',
 			]
 		];
+		$f3->set("months", $months);
 		
 		$days_of_week = [
 			'en' => [
@@ -198,12 +218,7 @@ class IndexCtrl
 				'Samedi',
 			]
 		];
-		
-		$f3->set("PAGE.title", "Planning par ordre de délai");
-		$f3->set("data2", $data2);
-		$f3->set("months", $months);
 		$f3->set("days_of_week", $days_of_week);
-		
 		
 		$view = new \View();
 		echo $view->render('priority.phtml');
