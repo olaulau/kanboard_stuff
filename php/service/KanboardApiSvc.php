@@ -52,11 +52,11 @@ abstract class KanboardApiSvc
 			$client->send();
 		}
 		catch (Exception $exception) {
-			echo "clientSendQuery (method = $method) EXCEPTION message : " . $exception->getMessage() . PHP_EOL;
+			echo "$method clientSendQuery EXCEPTION : " . $exception->getMessage() . PHP_EOL;
 			return 0;
 		}
 		if($result instanceof ErrorResponse) { /** @var ErrorResponse $result */
-			echo "ERROR RESPONSE message = " . $result->getMessage() . PHP_EOL;
+			echo "$method ERROR RESPONSE : " . $result->getMessage() . PHP_EOL;
 			return 0;
 		}
 		

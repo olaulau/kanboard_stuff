@@ -22,10 +22,10 @@ abstract class KanboardTaskApiSvc
 			$client->send();
 		}
 		catch (Exception $exception) {
-			echo "EXCEPTION message : " . $exception->getMessage();
+			echo "getAllTasksFromProject EXCEPTION : " . $exception->getMessage() . PHP_EOL;
 		}
 		if($result instanceof ErrorResponse) { /** @var ErrorResponse $result */
-			echo " ERROR RESPONSE message = " . $result->getMessage() . "<br/>" . PHP_EOL;
+			echo "getAllTasksFromProject ERROR RESPONSE : " . $result->getMessage() . "<br/>" . PHP_EOL;
 			return 0;
 		}
 		
@@ -61,11 +61,11 @@ abstract class KanboardTaskApiSvc
 			$client->send();
 		}
 		catch (Exception $exception) {
-			echo "EXCEPTION message : " . $exception->getMessage();
+			echo "getTaskByReference EXCEPTION : " . $exception->getMessage() . PHP_EOL;
 			die;
 		}
 		if($result instanceof ErrorResponse) { /** @var ErrorResponse $result */
-			echo " ERROR RESPONSE message = " . $result->getMessage() . "<br/>" . PHP_EOL;
+			echo "getTaskByReference ERROR RESPONSE : " . $result->getMessage() . "<br/>" . PHP_EOL;
 			die;
 		}
 		
@@ -88,10 +88,10 @@ abstract class KanboardTaskApiSvc
 			$client->send();
 		}
 		catch (Exception $exception) {
-			echo "EXCEPTION message : " . $exception->getMessage();
+			echo "searchTasks EXCEPTION : " . $exception->getMessage() . PHP_EOL;
 		}
 		if($result instanceof ErrorResponse) { /** @var ErrorResponse $result */
-			echo " ERROR RESPONSE message = " . $result->getMessage() . "<br/>" . PHP_EOL;
+			echo "searchTasks ERROR RESPONSE : " . $result->getMessage() . "<br/>" . PHP_EOL;
 			return 0;
 		}
 		
@@ -152,10 +152,10 @@ abstract class KanboardTaskApiSvc
 			$client->send();
 		}
 		catch (Exception $exception) {
-			echo "EXCEPTION message : " . $exception->getMessage();
+			echo "createTask EXCEPTION : " . $exception->getMessage() . PHP_EOL;
 		}
 		if($result instanceof ErrorResponse) { /** @var ErrorResponse $result */
-			echo "ERROR RESPONSE message = " . $result->getMessage() . PHP_EOL;
+			echo "createTask ERROR RESPONSE : " . $result->getMessage() . PHP_EOL;
 			return 0;
 		}
 		if($result === false) {
@@ -179,10 +179,10 @@ abstract class KanboardTaskApiSvc
 			$client->send();
 		}
 		catch (Exception $exception) {
-			echo "EXCEPTION message : " . $exception->getMessage();
+			echo "createComment EXCEPTION : " . $exception->getMessage() . PHP_EOL;
 		}
 		if($result instanceof ErrorResponse) { /** @var ErrorResponse $result */
-			echo " ERROR RESPONSE message = " . $result->getMessage() . "<br/>" . PHP_EOL;
+			echo "createComment ERROR RESPONSE : " . $result->getMessage() . "<br/>" . PHP_EOL;
 			return 0;
 		}
 
@@ -207,10 +207,10 @@ abstract class KanboardTaskApiSvc
 			$client->send();
 		}
 		catch (Exception $exception) {
-			echo "EXCEPTION message : " . $exception->getMessage();
+			echo "moveTaskPosition EXCEPTION : " . $exception->getMessage() . PHP_EOL;
 		}
 		if($result instanceof ErrorResponse) { /** @var ErrorResponse $result */
-			echo " ERROR RESPONSE message = " . $result->getMessage() . "<br/>" . PHP_EOL;
+			echo "moveTaskPosition ERROR RESPONSE : " . $result->getMessage() . "<br/>" . PHP_EOL;
 			return 0;
 		}
 
