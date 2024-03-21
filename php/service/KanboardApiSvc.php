@@ -14,7 +14,7 @@ abstract class KanboardApiSvc
 	{
 		$f3 = Base::instance();
 		$authentication = base64_encode($f3->get("kanboard.rpc.username").":".$f3->get("kanboard.rpc.token"));
-		$headers = ["Authorization" => "Basic $authentication"];
+		$headers = ["X-API-Auth" => "$authentication"];
 		return $headers;
 	}
 
@@ -74,7 +74,8 @@ abstract class KanboardApiSvc
 			$client->send();
 		}
 		catch (Exception $exception) {
-			echo "EXCEPTION message : " . $exception->getMessage();
+			echo "getVersion EXCEPTION : " . $exception->getMessage() . PHP_EOL;
+			die;
 		}
 
 		return $result;
