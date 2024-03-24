@@ -1,7 +1,5 @@
 # kanboard stuff :
 
-- migration from taskboard
-
 - list all tasks by due date
 
 - import estimate & productions automatically exported from cadratin  
