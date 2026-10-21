@@ -39,25 +39,28 @@ class IndexCtrl
 	{
 		$f3->set("PAGE.title", "Planning par ordre de délai");
 		
+		
 		// get conf vars
-		$project_id = $f3->get("kanboard.project_id"); ///////////////////////
-		$invoice_column_id = $f3->get("kanboard.invoice_column_id");
+		$cadratins = $f3->get("cadratin");
+		$cadratin = array_shift ($cadratins);
+		$project_id = $cadratin ["project_id"];
+		$invoice_column_id = $cadratin ["invoice_column_id"];
 		
 		// get column's tasks from API
-		$data = KanboardTaskApiSvc::searchTasks("project:$project_id"); ///////////////////////
+		$data = KanboardTaskApiSvc::searchTasks ($project_id, "project:$project_id");
 		
 		// get columns (indexed by id)
-		$columns = KanboardApiSvc::getColumns($project_id);
-		$columns = array_combine(array_column($columns, "id"), $columns);
+		$columns = KanboardApiSvc::getColumns ($project_id);
+		$columns = array_combine (array_column ($columns, "id"), $columns);
 		$f3->set("columns", $columns);
 		
 		// filter data
 		$data = array_filter($data,
 			function ($row) use ($invoice_column_id) {
-				if(empty($row["date_due"])) {
+				if (empty ($row["date_due"])) {
 					return false;
 				}
-				if($row["column_id"] == $invoice_column_id) {
+				if ($row["column_id"] == $invoice_column_id) {
 					return false;
 				}
 				return true;
@@ -65,8 +68,8 @@ class IndexCtrl
 		);
 		
 		// sort data
-		$keys = array_column($data, 'date_due');
-		array_multisort($keys, SORT_ASC, $data);
+		$keys = array_column ($data, 'date_due');
+		array_multisort ($keys, SORT_ASC, $data);
 		
 		// reformat data for output
 		$data2 = [];
@@ -185,7 +188,7 @@ class IndexCtrl
 				throw(new ErrorException("cadratin error"));
 			}
 		}
-		catch(Exception $ex) {
+		catch (Exception $ex) {
 			echo $ex->getMessage() . PHP_EOL;
 			$sort_subdir = CadratinSvc::$cadratin_error_subdir;
 		}
@@ -201,19 +204,19 @@ class IndexCtrl
 	public static function kanboardEstimatesPurgeCLI ($f3)
 	{
 		try {
-			$res = KanboardSvc::closeOldEstimates();
+			$res = KanboardSvc::closeOldEstimates ();
 			if($res !== true) {
-				throw(new ErrorException("unknown error while tying to close old estimates"));
+				throw new ErrorException ("unknown error while tying to close old estimates");
 			}
 		}
-		catch(Exception $ex) {
+		catch (Exception $ex) {
 			echo $ex->getMessage() . PHP_EOL;
 		}
 		
 		try {
-			$res = KanboardSvc::deleteDuplicateEstimates();
+			$res = KanboardSvc::deleteDuplicateEstimates ();
 			if($res !== true) {
-				throw(new ErrorException("unknown error while tying to delete duplicate estimates"));
+				throw new ErrorException ("unknown error while tying to delete duplicate estimates");
 			}
 		}
 		catch(Exception $ex) {
@@ -223,7 +226,7 @@ class IndexCtrl
 	
 	
 	public static function testGET ($f3) {
-		$version = KanboardApiSvc::getVersion();
+		$version = KanboardApiSvc::getVersion ();
 		echo "VERSION = $version";
 	}
 	

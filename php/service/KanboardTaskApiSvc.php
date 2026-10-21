@@ -46,11 +46,11 @@ abstract class KanboardTaskApiSvc
 	}
 	
 	
-	public static function getTaskByReference (int $reference)
+	public static function getTaskByReference (int $reference) //TODO unused
 	{
 		$f3 = Base::instance();
 		$params = [
-			"project_id"	=> $f3->get("kanboard.project_id"), /////////////////
+			"project_id"	=> $f3->get("kanboard.project_id"), //////////
 			"reference"		=> $reference,
 		];
 		
@@ -75,12 +75,10 @@ abstract class KanboardTaskApiSvc
 	
 	public static function searchTasks (string $project_id, string $query) : array
 	{
-		$f3 = Base::instance();
 		$params = [
 			"project_id"	=> $project_id,
 			"query"			=> $query,
 		];
-		
 		$client = KanboardApiSvc::getClient();
 		$client->query("searchTasks", $params, $result);
 		
@@ -89,23 +87,25 @@ abstract class KanboardTaskApiSvc
 		}
 		catch (Exception $exception) {
 			echo "searchTasks EXCEPTION : " . $exception->getMessage() . PHP_EOL;
+			return [];
 		}
 		if($result instanceof ErrorResponse) { /** @var ErrorResponse $result */
 			echo "searchTasks ERROR RESPONSE : " . $result->getMessage() . "<br/>" . PHP_EOL;
+			return [];
 		}
 		
 		return $result ?? [];
 	}
 	
 	
-	private static function getAllTasksFromColumn (int $column_id) : array
+	private static function getAllTasksFromColumn (int $column_id) : array //TODO virtually unused
 	{
 		$f3 = Base::instance();
-		$all_tasks = self::getAllTasksFromProject($f3->get("kanboard.project_id")); ///////////////////////////////
+		$all_tasks = self::getAllTasksFromProject ($f3->get("kanboard.project_id")); //////////
 
 		$res = [];
-		foreach($all_tasks as $task) {
-			if($task["column_id"] === $column_id) {
+		foreach ($all_tasks as $task) {
+			if ($task["column_id"] === $column_id) {
 				$res [] = $task;
 			}
 		}
@@ -121,19 +121,19 @@ abstract class KanboardTaskApiSvc
 		$params = [
 			"task_id" => $task_id,
 		];
-		$result = KanboardApiSvc::clientSendQuery("removeTask", $required_params, $params);
+		$result = KanboardApiSvc::clientSendQuery ("removeTask", $required_params, $params);
 		return $result;
 	}
 
 
-	public static function removeAllTasksFromColumn (int $column_id)
+	public static function removeAllTasksFromColumn (int $column_id) //TODO unused
 	{
 		$f3 = Base::instance();
-		$estimate_column_id = $f3->get("kanboard.estimate_column_id"); /////////////////////
+		$estimate_column_id = $f3->get("kanboard.estimate_column_id"); //////////
 
-		$tasks = KanboardTaskApiSvc::getAllTasksFromColumn($estimate_column_id);
-		foreach($tasks as $task) {
-			KanboardTaskApiSvc::removeTask($task["id"]);
+		$tasks = KanboardTaskApiSvc::getAllTasksFromColumn ($estimate_column_id);
+		foreach ($tasks as $task) {
+			KanboardTaskApiSvc::removeTask ($task["id"]);
 		}
 	}
 
@@ -189,12 +189,12 @@ abstract class KanboardTaskApiSvc
 	}
 	
 	
-	public static function moveTaskPosition (int $task_id, int $dest_column_id, int $position)
+	public static function moveTaskPosition (int $task_id, int $dest_column_id, int $position) //TODO unused
 	{
 		$f3 = Base::instance();
 		$client = KanboardApiSvc::getClient();
 		$params = [
-			"project_id"	=> $f3->get("kanboard.project_id"), ////////////////////////
+			"project_id"	=> $f3->get("kanboard.project_id"), //////////
 			"task_id"		=> $task_id,
 			"column_id"		=> $dest_column_id,
 			"position"		=> $position,
@@ -222,8 +222,7 @@ abstract class KanboardTaskApiSvc
 		$params = [
 			"task_id"		=> $task_id,
 		];
-		
-		$result = KanboardApiSvc::clientSendQuery("closeTask", ["task_id"], $params);
+		$result = KanboardApiSvc::clientSendQuery ("closeTask", ["task_id"], $params);
 		return $result;
 	}
 
@@ -233,8 +232,7 @@ abstract class KanboardTaskApiSvc
 		$params = [
 			"task_id"		=> $task_id,
 		];
-		
-		$result = KanboardApiSvc::clientSendQuery("openTask", ["task_id"], $params);
+		$result = KanboardApiSvc::clientSendQuery ("openTask", ["task_id"], $params);
 		return $result;
 	}
 	
@@ -244,7 +242,7 @@ abstract class KanboardTaskApiSvc
 		$required_params = [
 			"id",
 		];
-		$result = KanboardApiSvc::clientSendQuery("updateTask", $required_params, $params);
+		$result = KanboardApiSvc::clientSendQuery ("updateTask", $required_params, $params);
 		return $result;
 	}
 
@@ -260,7 +258,7 @@ abstract class KanboardTaskApiSvc
 			"project_id" => 	$project_id,
 			"column_id" => 		$column_id,
 		];
-		$result = KanboardApiSvc::clientSendQuery("duplicateTaskToProject", $required_params, $params);
+		$result = KanboardApiSvc::clientSendQuery ("duplicateTaskToProject", $required_params, $params);
 		return $result;
 	}
 
