@@ -40,11 +40,11 @@ class IndexCtrl
 		$f3->set("PAGE.title", "Planning par ordre de délai");
 		
 		// get conf vars
-		$project_id = $f3->get("kanboard.project_id");
+		$project_id = $f3->get("kanboard.project_id"); ///////////////////////
 		$invoice_column_id = $f3->get("kanboard.invoice_column_id");
 		
 		// get column's tasks from API
-		$data = KanboardTaskApiSvc::searchTasks("project:$project_id");
+		$data = KanboardTaskApiSvc::searchTasks("project:$project_id"); ///////////////////////
 		
 		// get columns (indexed by id)
 		$columns = KanboardApiSvc::getColumns($project_id);

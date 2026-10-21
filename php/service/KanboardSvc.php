@@ -3,7 +3,6 @@ namespace service;
 
 use Base;
 use DateTime;
-use DB\SQL;
 use ErrorException;
 
 abstract class KanboardSvc
@@ -13,33 +12,22 @@ abstract class KanboardSvc
 	{
 		// prepare data
 		$f3 = Base::instance();
-		$project_id = $f3->get("kanboard.project_id");
-		$estimate_column_id = $f3->get("kanboard.estimate_column_id");
-		
-		$estimate_number = intval($csv["Numéro nu"]);
+		$estimate_number = intval ($csv["Numéro nu"]);
 		echo "devis n° {$estimate_number}" . PHP_EOL;
-		if(empty($estimate_number)) {
+		if (empty ($estimate_number)) {
 			throw new ErrorException("ERROR while analyzing estimate number (numéro nu) which seems to be empty");
 		}
 		
-		// remove deleted estimates to avoid duplicate reference
-		$tasks = KanboardTaskApiSvc::searchTasks("column:$estimate_column_id ref:" . $estimate_number);
-		foreach($tasks as $task) {
-			echo "removing deleted estimate task id = {$task["id"]} reference = {$task["reference"]}" . PHP_EOL;
-			KanboardTaskApiSvc::removeTask($task["id"]);
-		}
+		// get config
+		list ($color, $cadratin) = Stuff::get_config_from_code_compta($csv["Code compta"]);
+		$project_id = $cadratin ["project_id"];
+		$estimate_column_id = $cadratin ["estimate_column_id"];
 		
-		// calculate color
-		$cadratin_code_compta_color = $f3->get("cadratin.code_compta_color");
-		foreach($cadratin_code_compta_color as $color => $codes_compta) {
-			if(is_int($codes_compta)) {
-				$codes_compta = [$codes_compta];
-			}
-			foreach($codes_compta as $code_compta) {
-				if(strpos($csv["Code compta"], strval($code_compta)) === 0) {
-					break 2;
-				}
-			}
+		// remove deleted estimates to avoid duplicate reference
+		$tasks = KanboardTaskApiSvc::searchTasks ($project_id, "column:$estimate_column_id ref:" . $estimate_number);
+		foreach ($tasks as $task) {
+			echo "removing deleted estimate task id = {$task["id"]} reference = {$task["reference"]}" . PHP_EOL;
+			KanboardTaskApiSvc::removeTask ($task["id"]);
 		}
 		
 		// create task
@@ -52,7 +40,7 @@ abstract class KanboardSvc
 			"reference"		=> $estimate_number,
 		];
 		
-		$date = \DateTime::createFromFormat("d/m/Y", $csv["Date pièce"]);
+		$date = DateTime::createFromFormat("d/m/Y", $csv["Date pièce"]);
 		if($date !== false) {
 			$params["date_due"] = $date->format("Y-m-d") . " 00:00";
 		}
@@ -90,25 +78,31 @@ abstract class KanboardSvc
 	{
 		// prepare data
 		$f3 = Base::instance();
-		$project_id = $f3->get("kanboard.project_id");
+		$project_id = $f3->get("kanboard.project_id"); //////////////////
 		$estimate_column_id = $f3->get("kanboard.estimate_column_id");
 		$production_column_id = $f3->get("kanboard.production_column_id");
 		
-		$estimate_number = intval($csv["N/référence"]);
+		$estimate_number = intval ($csv["N/référence"]);
 		echo "devis n° {$estimate_number}" . PHP_EOL;
 		if(empty($estimate_number)) {
 			throw new ErrorException("ERROR while analyzing estimate number (N/référence) which seems to be empty");
 		}
 		
+		// get config
+		list (, $cadratin) = Stuff::get_config_from_code_compta ($csv["Code compta"]);
+		$project_id = $cadratin ["project_id"];
+		$estimate_column_id = $cadratin ["estimate_column_id"];
+		$production_column_id = $cadratin ["production_column_id"];
+		
 		// find reference task
-		$tasks = KanboardTaskApiSvc::searchTasks("column:$estimate_column_id ref:$estimate_number");
-		if($tasks === false) {
+		$tasks = KanboardTaskApiSvc::searchTasks($project_id, "column:$estimate_column_id ref:$estimate_number");
+		if ($tasks === false) {
 			throw new ErrorException("ERROR while searching for reference task");
 		}
-		if(count($tasks) > 1) {
+		if (count ($tasks) > 1) {
 			throw new ErrorException("BUG : too many tasks reference = $estimate_number");
 		}
-		if(count($tasks) === 0) { // didn't find estimate task
+		if (count($tasks) === 0) { // didn't find estimate task
 			// create empty estimate task
 			$params = [
 				"project_id"	=> $project_id,
@@ -118,7 +112,7 @@ abstract class KanboardSvc
 				"reference"		=> $estimate_number,
 			];
 			
-			$date = \DateTime::createFromFormat("d/m/Y", $csv["Date de livraison prévision produit N°1"]);
+			$date = DateTime::createFromFormat("d/m/Y", $csv["Date de livraison prévision produit N°1"]);
 			if($date !== false) {
 				$params["date_due"] = $date->format("Y-m-d") . " 00:00";
 			}
@@ -146,7 +140,7 @@ abstract class KanboardSvc
 			$params["title"] .= " cde n° {$csv["V/référence"]}";
 		}
 		if(!empty($csv["Date de livraison prévision produit N°1"])) {
-			$date = \DateTime::createFromFormat("d/m/Y", $csv["Date de livraison prévision produit N°1"]);
+			$date = DateTime::createFromFormat("d/m/Y", $csv["Date de livraison prévision produit N°1"]);
 			if($date !== false) {
 				$params["date_due"] = $date->format("Y-m-d") . " 00:00";
 			}
@@ -171,11 +165,11 @@ abstract class KanboardSvc
 	{
 		// prepare data
 		$f3 = Base::instance();
-		$estimate_column_id = $f3->get("kanboard.estimate_column_id");
+		$estimate_column_id = $f3->get("kanboard.estimate_column_id"); /////////////////////
 		$estimate_days_expire = $f3->get("kanboard.estimate_days_expire");
 		
 		// get all opened estimate tasks
-		$tasks = KanboardTaskApiSvc::searchTasks("status:open column:$estimate_column_id");
+		$tasks = KanboardTaskApiSvc::searchTasks("status:open column:$estimate_column_id"); ////////////////////
 		
 		// close old estimates
 		$result = true;
@@ -201,10 +195,10 @@ abstract class KanboardSvc
 	{
 		// prepare data
 		$f3 = Base::instance();
-		$estimate_column_id = $f3->get("kanboard.estimate_column_id");
+		$estimate_column_id = $f3->get("kanboard.estimate_column_id"); /////////////////////
 		
 		// get all estimates
-		$estimates = KanboardTaskApiSvc::searchTasks("column:{$estimate_column_id}");
+		$estimates = KanboardTaskApiSvc::searchTasks("column:{$estimate_column_id}"); ///////////////////////
 		
 		// group by reference
 		$tasks_grouped = [];

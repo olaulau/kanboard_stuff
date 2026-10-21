@@ -50,7 +50,7 @@ abstract class KanboardTaskApiSvc
 	{
 		$f3 = Base::instance();
 		$params = [
-			"project_id"	=> $f3->get("kanboard.project_id"),
+			"project_id"	=> $f3->get("kanboard.project_id"), /////////////////
 			"reference"		=> $reference,
 		];
 		
@@ -73,11 +73,11 @@ abstract class KanboardTaskApiSvc
 	}
 	
 	
-	public static function searchTasks (string $query) : array
+	public static function searchTasks (string $project_id, string $query) : array
 	{
 		$f3 = Base::instance();
 		$params = [
-			"project_id"	=> $f3->get("kanboard.project_id"),
+			"project_id"	=> $project_id,
 			"query"			=> $query,
 		];
 		
@@ -92,17 +92,16 @@ abstract class KanboardTaskApiSvc
 		}
 		if($result instanceof ErrorResponse) { /** @var ErrorResponse $result */
 			echo "searchTasks ERROR RESPONSE : " . $result->getMessage() . "<br/>" . PHP_EOL;
-			return 0;
 		}
 		
-		return $result;
+		return $result ?? [];
 	}
 	
 	
 	private static function getAllTasksFromColumn (int $column_id) : array
 	{
 		$f3 = Base::instance();
-		$all_tasks = self::getAllTasksFromProject($f3->get("kanboard.project_id"));
+		$all_tasks = self::getAllTasksFromProject($f3->get("kanboard.project_id")); ///////////////////////////////
 
 		$res = [];
 		foreach($all_tasks as $task) {
@@ -130,7 +129,7 @@ abstract class KanboardTaskApiSvc
 	public static function removeAllTasksFromColumn (int $column_id)
 	{
 		$f3 = Base::instance();
-		$estimate_column_id = $f3->get("kanboard.estimate_column_id");
+		$estimate_column_id = $f3->get("kanboard.estimate_column_id"); /////////////////////
 
 		$tasks = KanboardTaskApiSvc::getAllTasksFromColumn($estimate_column_id);
 		foreach($tasks as $task) {
@@ -195,7 +194,7 @@ abstract class KanboardTaskApiSvc
 		$f3 = Base::instance();
 		$client = KanboardApiSvc::getClient();
 		$params = [
-			"project_id"	=> $f3->get("kanboard.project_id"),
+			"project_id"	=> $f3->get("kanboard.project_id"), ////////////////////////
 			"task_id"		=> $task_id,
 			"column_id"		=> $dest_column_id,
 			"position"		=> $position,

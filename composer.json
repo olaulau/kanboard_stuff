@@ -7,6 +7,6 @@
 	],
 	"require": {
 		"olaulau/htmlskel": "dev-master",
-		"datto/json-rpc-http": "^5.0"
+		"hcs-llc/php-json-rpc-http": "^6.0"
 	}
 }

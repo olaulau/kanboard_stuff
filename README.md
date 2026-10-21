@@ -1,5 +1,9 @@
-# kanboard stuff :
+# kanboard stuff
 
+# tech
+- PHP 8.3 (8.4 WiP)
+
+## features
 - list all tasks by due date
 
 - import estimate & productions automatically exported from cadratin  
@@ -10,5 +14,6 @@
 	./inotify/cadratin_inotify.sh  
 
 - close old estimates  
+	mkdir -p tmp/log/
 	crontab -e  
-		0	2	*	*	*	php index.php kanboard estimates_purge
+		0	2	*	*	*	cd kanboard_stuff/; (date && php index.php kanboard estimates_purge) 2>&1 >> tmp/log/estimates_purge.log

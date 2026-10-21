@@ -28,7 +28,7 @@ abstract class CadratinSvc
 		
 		// read file
 		$data = [];
-		while (($row = fgetcsv($csv, null, self::$csv_field_separator)) !== FALSE) {
+		while (($row = fgetcsv($csv, null, self::$csv_field_separator, "\"", "\\")) !== FALSE) {
 			$data [] = $row;
 		}
 		fclose($csv);
